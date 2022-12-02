@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * @file
+ * Provides a block displaying prayer times for the visitor's location
+ */
+function mmoda_{{ instrument_name }}_enable() {
+  $instrument = mmoda_{{ instrument_name }}_instrument_info()['name'];
+  _mmodaa_instrument_enable($instrument);
+}
+
+function mmoda_{{ instrument_name }}_disable() {
+  $instrument = mmoda_{{ instrument_name }}_instrument_info()['name'];
+  _mmodaa_instrument_disable($instrument);
+}
+
+function mmoda_{{ instrument_name }}_init() {
+}
+
+/**
+ * Implements hook_help().
+ */
+function mmoda_{{ instrument_name }}_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#mmoda_{{ instrument_name }}' :
+      $output = '<p>';
+      $output .= t ( "MMODA {{ instrument_name|capitalize }}." );
+      $output .= '</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_permission().
+ */
+
+function mmoda_{{ instrument_name }}_permission() {
+  return array (
+      'administer mmoda {{ instrument_name }}' => array (
+          'description' => t ( 'Administer MMODA {{ instrument_name|capitalize }}' ),
+          'title' => t ( 'Administer MMODA {{ instrument_name|capitalize }}' ),
+          'restrict access' => TRUE
+      ),
+      'access mmoda {{ instrument_name }}' => array (
+          'description' => t ( 'Access MMODA {{ instrument_name|capitalize }}' ),
+          'title' => t ( 'Access MMODA {{ instrument_name|capitalize }}' ),
+          'restrict access' => TRUE
+      )
+  );
+}
+
+/**
+ * Menu callback.
+ * Prints a listing of active nodes on the site.
+ */
+function mmoda_{{ instrument_name }}_menu() {
+  $items = array ();
+  
+  $items ['admin/config/mmoda/{{ instrument_name }}'] = array (
+      'title' => 'Administer MMODA {{ instrument_name|capitalize }}',
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array (
+          'mmoda_{{ instrument_name }}_admin_settings'
+      ),
+      'description' => 'Edit MMODA {{ instrument_name|capitalize }} settings.',
+      'file' => 'mmoda_{{ instrument_name }}.admin.inc'
+  );
+  // 'weight' => -10,
+  
+  return $items;
+}
+

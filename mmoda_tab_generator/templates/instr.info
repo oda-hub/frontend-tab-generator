@@ -1,0 +1,8 @@
+name = MMODA {{ instrument_name|capitalize }}
+description = MMODA module for {{ instrument_name|capitalize }}
+core = 7.x
+dependencies[] = mmoda
+
+files[] = mmoda_{{ instrument_name }}.inc
+
+configure = admin/config/mmoda/{{ instrument_name }}

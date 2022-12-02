@@ -1,0 +1,2 @@
+dispatcher_url: http://localhost:8000
+instruments_dir_path: ./generated_tabs

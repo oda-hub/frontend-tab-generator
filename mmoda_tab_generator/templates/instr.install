@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the mmoda module.
+ */
+$module_name = basename(__FILE__, '.install');
+list ($core_module_name) = explode('_', $module_name);
+include_once drupal_get_path('module', $core_module_name) . '/' . $core_module_name . '.lib.inc';
+
+function mmoda_{{ instrument_name }}_instrument_info()
+{
+  $info = array(
+    'name' => '{{ instrument_name }}',
+    'messenger' => ' ',
+    'title' => '{{ instrument_name|capitalize }}'
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function mmoda_{{ instrument_name }}_requirements($phase)
+{
+  $requirements = array();
+  $conflicts = array();
+  if ('install' == $phase) {}
+
+  if ($phase == 'runtime') {}
+
+  return $requirements;
+}
+
+function mmoda_{{ instrument_name }}_install()
+{
+  $instrument_info = mmoda_{{ instrument_name }}_instrument_info();
+
+  $module_settings = array(
+    'enabled' => TRUE,
+    'query_type' => 'Real',
+    'weight' => 100,
+    'product_type' => '{{ default_product_type }}',
+    {% for k, v in defaults %}
+    '{{ k }}' => {{ v }},
+    {% endfor %} 
+    'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER',
+    'enable_use_catalog' => FALSE {# TODO #}
+  );
+  $module_settings= array_merge($instrument_info, $module_settings);
+
+  $module_name = basename(__FILE__, '.install');
+  _mmoda_common_install($module_name, $instrument_info['name'], $module_settings);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function mmoda_{{ instrument_name }}_uninstall()
+{
+  $module_name = basename(__FILE__, '.install');
+  $instrument = mmoda_{{ instrument_name }}_instrument_info()['name'];
+  _mmoda_common_uninstall($module_name, $instrument);
+}
+
