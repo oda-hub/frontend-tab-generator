@@ -60,10 +60,24 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
 
   {% for par_name, par_detail in param_dict.items() %}
   
-
   $form['{{ par_name }}'] = array(
+    {% if par_detail['value'].__class__.__name__ == 'bool' %}
+    '#type' => 'radios',
+    '#options' => array(
+      True => 'True',
+      False => 'False'
+    ),
+    {% elif 'restrictions' in par_detail and par_detail['restrictions'].get('allowed_values', []) %}
+    '#type' => 'select',
+    '#options' => array(
+      {% for val in par_detail['restrictions']['allowed_values'] %}
+      '{{ val }}' => '{{ val }}',
+      {% endfor %}
+    ),    
+    {% else %}
     '#type' => 'textfield',
-    '#title' => t("{{ par_name|capitalize }}"),
+    {% endif %}
+    '#title' => t("{{ par_name }}"),
     '#default_value' => $instrument_defaults['{{ par_name }}'],
     {% if par_detail.units %}
     '#field_suffix' => t("{{ par_detail.units }}"),
@@ -84,6 +98,21 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
         ),
       )
     ), 
+    '#attributes' => array(
+      'name' => $mform_id . '{{ par_name }}',
+
+      {% if 'restrictions' in par_detail and par_detail['restrictions'].get('min_value', None) and par_detail['restrictions'].get('max_value', None) %}
+      'data-bv-between-max' => '{{ par_detail['restrictions']['max_value'] }}',
+      'data-bv-between-min' => '{{ par_detail['restrictions']['min_value'] }}',
+      
+      {% elif 'restrictions' in par_detail and par_detail['restrictions'].get('min_value', None) %}
+      'data-bv-greaterthan-value' => '{{ par_detail['restrictions']['min_value'] }}',
+    
+      {% elif 'restrictions' in par_detail  and par_detail['restrictions'].get('max_value', None) %}
+      'data-bv-lessthan-value' => '{{ par_detail['restrictions']['max_value'] }}',
+
+      {% endif %}
+    ),
     '#parent_classes' => array(
       'form-group',
       'col-md-6'
@@ -94,7 +123,6 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
     '#prefix' => '<div class="row">',
     '#suffix' => '</div>'
   );
-
 
   {% endfor %}
 

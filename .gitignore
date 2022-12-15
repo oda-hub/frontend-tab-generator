@@ -4,3 +4,4 @@
 build*
 **__pycache__
 **.egg-info
+generated_tabs

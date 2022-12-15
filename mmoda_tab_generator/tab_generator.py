@@ -5,7 +5,7 @@ import json
 from jinja2 import Environment, PackageLoader
 import os
 import argparse
-from . import Config
+from mmoda_tab_generator import Config
 
 class MMODATabGenerator:
     def __init__(self, dispatcher_url):
