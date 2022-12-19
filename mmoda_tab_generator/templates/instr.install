@@ -46,7 +46,8 @@ function mmoda_{{ instrument_name }}_install()
     '{{ k }}' => {{ v }},
     {% endfor %} 
     'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER',
-    'enable_use_catalog' => FALSE {# TODO #}
+    'enable_use_catalog' => FALSE, {# TODO #}
+    'only_roles' => 'developer',
   );
   $module_settings= array_merge($instrument_info, $module_settings);
 
