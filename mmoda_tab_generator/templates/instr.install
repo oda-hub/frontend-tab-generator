@@ -43,11 +43,11 @@ function mmoda_{{ instrument_name }}_install()
     'weight' => 100,
     'product_type' => '{{ default_product_type }}',
     {% for k, v in defaults %}
-    '{{ k }}' => {{ v }},
+    '{{ k }}' => {{ v | tojson }},
     {% endfor %} 
-    'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER',
-    'enable_use_catalog' => FALSE, {# TODO #}
-    'only_roles' => 'developer',
+    'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER', {# TODO: #}
+    'enable_use_catalog' => FALSE, {# TODO: #}
+    'only_roles' => '{{ roles }}',
   );
   $module_settings= array_merge($instrument_info, $module_settings);
 
