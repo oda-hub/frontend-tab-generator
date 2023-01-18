@@ -27,34 +27,36 @@ class MMODATabGenerator:
                 
         param_dict = {}
         products_list = []
-        for _item in jmeta[0]:
-            if isinstance(_item, dict):
-                item = _item
-            else:
+        
+        # we relay on the metadata order, not ideal but better than e.g. query_name that may be redefined
+        _item = jmeta[0][3]
+        if isinstance(_item, str):
+            item = json.loads(_item)
+        else:
+            item = _item
+        for par in item[1:]:
+            param_dict[par['name']] = par
+            param_dict[par['name']]['in_instr_query'] = True
+
+        for _item in jmeta[0][4:]:
+            if isinstance(_item, str):
                 item = json.loads(_item)
-            
-            if isinstance(item, list):
-                if item[0]['query_name'] == 'src_query':
-                    continue
-                elif item[0]['query_name'] == 'instr_query':
-                    for par in item[1:]:
-                        param_dict[par['name']] = par
-                        param_dict[par['name']]['in_instr_query'] = True
+            else:
+                item = _item
+            product_name = item[1]['product_name']
+            products_list.append(product_name)
+            for par in item[2:]:
+                if par['name'] in param_dict.keys():
+                    param_dict[par['name']]['products'].append(product_name)
                 else:
-                    product_name = item[1]['product_name']
-                    products_list.append(product_name)
-                    for par in item[2:]:
-                        if par['name'] in param_dict.keys():
-                            param_dict[par['name']]['products'].append(product_name)
-                        else:
-                            param_dict[par['name']] = par
-                            param_dict[par['name']]['products'] = [product_name]
-                        param_dict[par['name']]['in_instr_query'] = False
+                    param_dict[par['name']] = par
+                    param_dict[par['name']]['products'] = [product_name]
+                param_dict[par['name']]['in_instr_query'] = False
 
         return param_dict, products_list
 
 
-    def generate(self, instrument_name, instruments_dir_path, frontend_name, roles):
+    def generate(self, instrument_name, instruments_dir_path, frontend_name, roles, form_dispatcher_url):
         param_dict, products_list = self._arrange_data(instrument_name)
         
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
@@ -80,7 +82,8 @@ class MMODATabGenerator:
 
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
-            fd.write(templ.render(instrument_name = frontend_name,
+            fd.write(templ.render(form_dispatcher_url = form_dispatcher_url,
+                                  instrument_name = frontend_name,
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
                                   products_list = products_list))
@@ -95,6 +98,7 @@ def main():
     parser.add_argument('-c', '--config')
     parser.add_argument('-r', '--roles', default='developer')
     parser.add_argument('--frontend_name')
+    parser.add_argument('--form_dispatcher_url', default='dispatch-data/run_analysis')
     args = parser.parse_args()
     
     if not args.config:
@@ -109,9 +113,14 @@ def main():
     instrument_name = args.name
     frontend_name = args.frontend_name if args.frontend_name else instrument_name
     roles = args.roles
+    form_dispatcher_url = args.form_dispatcher_url 
     
     generator = MMODATabGenerator(dispatcher_url)
-    generator.generate(instrument_name, instruments_dir_path, frontend_name, roles)
+    generator.generate(instrument_name, 
+                       instruments_dir_path, 
+                       frontend_name, 
+                       roles, 
+                       form_dispatcher_url)
     
 if __name__ == '__main__':
     main()
