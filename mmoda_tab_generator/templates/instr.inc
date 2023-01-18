@@ -87,7 +87,7 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
   // turn off form caching
   $mform_id = __FUNCTION__ . '_';
 
-  $form['#action'] = 'dispatch-data/run_analysis';
+  $form['#action'] = '{{ form_dispatcher_url }}';
   $form['#method'] = 'POST';
   $form['#attributes'] = array(
     'class' => '{{ instrument_name }}-form'
@@ -148,5 +148,3 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
 
   return ($form);
 }
-
-?>
