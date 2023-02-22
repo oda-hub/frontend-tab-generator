@@ -40,14 +40,14 @@ function mmoda_{{ instrument_name }}_install()
   $module_settings = array(
     'enabled' => TRUE,
     'query_type' => 'Real',
-    'weight' => 100,
+    'weight' => {{ weight }},
     'product_type' => '{{ default_product_type }}',
     {% for k, v in defaults %}
     '{{ k }}' => {{ v | tojson }},
     {% endfor %} 
     'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER', {# TODO: #}
     'enable_use_catalog' => FALSE, {# TODO: #}
-    'only_roles' => '{{ roles }}',
+    'allowed_roles' => '{{ roles }}',
   );
   $module_settings= array_merge($instrument_info, $module_settings);
 
