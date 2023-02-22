@@ -35,6 +35,8 @@ class MMODATabGenerator:
         else:
             item = _item
         for par in item[1:]:
+            if par['name'] == 'T_format':
+                continue
             param_dict[par['name']] = par
             param_dict[par['name']]['in_instr_query'] = True
 
@@ -46,6 +48,8 @@ class MMODATabGenerator:
             product_name = item[1]['product_name']
             products_list.append(product_name)
             for par in item[2:]:
+                if par['name'] == 'T_format':
+                    continue
                 if par['name'] in param_dict.keys():
                     param_dict[par['name']]['products'].append(product_name)
                 else:
