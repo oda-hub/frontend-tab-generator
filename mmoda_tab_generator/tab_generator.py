@@ -6,6 +6,7 @@ from jinja2 import Environment, PackageLoader
 import os
 import argparse
 from mmoda_tab_generator import Config
+import sys
 
 class MMODATabGenerator:
     def __init__(self, dispatcher_url):
@@ -95,7 +96,7 @@ class MMODATabGenerator:
         
 
 
-def main():
+def main(args):
     parser = argparse.ArgumentParser(description = 'Generate MMODA frontend tab')
     parser.add_argument('-u', '--url')
     parser.add_argument('-n', '--name', required=True)
@@ -105,7 +106,7 @@ def main():
     parser.add_argument('--frontend_name')
     parser.add_argument('--form_dispatcher_url', default='dispatch-data/run_analysis')
     parser.add_argument('-w', required=True)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     
     if not args.config:
         if not args.url or not args.path:
@@ -131,4 +132,4 @@ def main():
                        weight)
     
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
