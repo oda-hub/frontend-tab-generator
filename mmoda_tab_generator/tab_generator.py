@@ -6,6 +6,11 @@ from jinja2 import Environment, PackageLoader
 import os
 import argparse
 from mmoda_tab_generator import Config
+import time
+import jwt
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MMODATabGenerator:
     def __init__(self, dispatcher_url):
@@ -14,8 +19,23 @@ class MMODATabGenerator:
     def _request_data(self, instrument_name, num_try = 5):
         for n in range(num_try):        
             try:
+                secret_key = os.getenv('ODA_JWT_TOKEN')
+                if secret_key:
+                    token_payload = {'sub': 'oda-bot@odahub.io',
+                                     'email': 'oda-bot@odahub.io',
+                                     'name': 'oda-bot',
+                                     'roles': 'oda workflow developer',
+                                     'exp': time.time()+300}
+                    token = jwt.encode(token_payload, secret_key, algorithm='HS256') # TODO: hardcoded algorithm
+                else:
+                    logger.warning('Will try to get instrument meta-data as unauthenticated user.')
+                    token = None
+                
+                params = {'instrument': instrument_name}
+                if token is not None: 
+                    params['token'] = token
                 res = requests.get('/'.join([self.dispatcher_url.strip('/'), 'api/meta-data']),
-                                params={'instrument': instrument_name})
+                                   params = params)
                 if res.status_code == 200:
                     return json.loads(res.text)
             except:
