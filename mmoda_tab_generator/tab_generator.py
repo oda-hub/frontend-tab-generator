@@ -19,7 +19,7 @@ class MMODATabGenerator:
     def _request_data(self, instrument_name, num_try = 5):
         for n in range(num_try):        
             try:
-                secret_key = os.getenv('ODA_JWT_TOKEN')
+                secret_key = os.getenv('ODA_JWT_SECRET')
                 if secret_key:
                     token_payload = {'sub': 'oda-bot@odahub.io',
                                      'email': 'oda-bot@odahub.io',
@@ -39,6 +39,7 @@ class MMODATabGenerator:
                 if res.status_code == 200:
                     return json.loads(res.text)
             except:
+                time.sleep(10)
                 continue
         raise RuntimeError('Unable to get data from dispatcher')
 
