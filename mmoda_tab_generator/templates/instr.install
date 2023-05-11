@@ -12,7 +12,7 @@ function mmoda_{{ instrument_name }}_instrument_info()
 {
   $info = array(
     'name' => '{{ instrument_name }}',
-    'messenger' => ' ',
+    'messenger' => '{{ messenger }}',
     'title' => '{{ instrument_name|capitalize }}'
   );
 

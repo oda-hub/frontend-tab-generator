@@ -81,7 +81,7 @@ class MMODATabGenerator:
         return param_dict, products_list
 
 
-    def generate(self, instrument_name, instruments_dir_path, frontend_name, roles, form_dispatcher_url, weight):
+    def generate(self, instrument_name, instruments_dir_path, frontend_name, messenger, roles, form_dispatcher_url, weight):
         param_dict, products_list = self._arrange_data(instrument_name)
         
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
@@ -104,7 +104,8 @@ class MMODATabGenerator:
                                   defaults = [(k, v['value']) for k, v in param_dict.items()], 
                                   default_product_type = products_list[0],
                                   roles = roles,
-                                  weight=weight))
+                                  weight=weight,
+                                  messenger=messenger))
 
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
@@ -124,6 +125,7 @@ def main():
     parser.add_argument('-c', '--config')
     parser.add_argument('-r', '--roles', default='developer')
     parser.add_argument('--frontend_name')
+    parser.add_argument('--messenger', default = ' ')
     parser.add_argument('--form_dispatcher_url', default='dispatch-data/run_analysis')
     parser.add_argument('-w', required=True)
     args = parser.parse_args()
@@ -142,11 +144,13 @@ def main():
     roles = args.roles
     form_dispatcher_url = args.form_dispatcher_url 
     weight = args.w
+    messenger = args.messenger
     
     generator = MMODATabGenerator(dispatcher_url)
     generator.generate(instrument_name, 
                        instruments_dir_path, 
                        frontend_name, 
+                       messenger,
                        roles, 
                        form_dispatcher_url,
                        weight)
