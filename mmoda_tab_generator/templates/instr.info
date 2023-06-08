@@ -1,8 +1,8 @@
-name = MMODA {{ instrument_name|capitalize }}
-description = MMODA module for {{ instrument_name|capitalize }}
+name = MMODA {{ instrument_title }}
+description = MMODA module for {{ instrument_title }}
 core = 7.x
 dependencies[] = mmoda
 
-files[] = mmoda_{{ instrument_name }}.inc
+files[] = mmoda_{{ frontend_name }}.inc
 
-configure = admin/config/mmoda/{{ instrument_name }}
+configure = admin/config/mmoda/{{ frontend_name }}

@@ -81,7 +81,7 @@ class MMODATabGenerator:
         return param_dict, products_list
 
 
-    def generate(self, instrument_name, instruments_dir_path, frontend_name, messenger, roles, form_dispatcher_url, weight):
+    def generate(self, instrument_name, instruments_dir_path, frontend_name, title, messenger, roles, form_dispatcher_url, weight):
         param_dict, products_list = self._arrange_data(instrument_name)
         
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
@@ -92,15 +92,18 @@ class MMODATabGenerator:
 
         templ = jenv.get_template('instr.info')
         with open(f"{basename}.info", 'w') as fd:
-            fd.write(templ.render(instrument_name = frontend_name))
+            fd.write(templ.render(frontend_name = frontend_name,
+                                  instrument_title = title))
 
         templ = jenv.get_template('instr.module')
         with open(f"{basename}.module", 'w') as fd:
-            fd.write(templ.render(instrument_name = frontend_name))
+            fd.write(templ.render(frontend_name = frontend_name,
+                                  instrument_title = title))
 
         templ = jenv.get_template('instr.install')
         with open(f"{basename}.install", 'w') as fd:
-            fd.write(templ.render(instrument_name = frontend_name,
+            fd.write(templ.render(frontend_name = frontend_name,
+                                  instrument_title = title,
                                   defaults = [(k, v['value']) for k, v in param_dict.items()], 
                                   default_product_type = products_list[0],
                                   roles = roles,
@@ -110,7 +113,7 @@ class MMODATabGenerator:
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
             fd.write(templ.render(form_dispatcher_url = form_dispatcher_url,
-                                  instrument_name = frontend_name,
+                                  frontend_name = frontend_name,
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
                                   products_list = products_list))
@@ -121,6 +124,7 @@ def main():
     parser = argparse.ArgumentParser(description = 'Generate MMODA frontend tab')
     parser.add_argument('-u', '--url')
     parser.add_argument('-n', '--name', required=True)
+    parser.add_argument('-N', '--title')
     parser.add_argument('-p', '--path')
     parser.add_argument('-c', '--config')
     parser.add_argument('-r', '--roles', default='developer')
@@ -141,6 +145,7 @@ def main():
     instruments_dir_path = args.path if args.path else conf.instruments_dir_path
     instrument_name = args.name
     frontend_name = args.frontend_name if args.frontend_name else instrument_name
+    title = args.title if args.title else ' '.join([x.capitalize() for x in instrument_name.replace('_', ' ').split()])
     roles = args.roles
     form_dispatcher_url = args.form_dispatcher_url 
     weight = args.w
@@ -150,6 +155,7 @@ def main():
     generator.generate(instrument_name, 
                        instruments_dir_path, 
                        frontend_name, 
+                       title,
                        messenger,
                        roles, 
                        form_dispatcher_url,

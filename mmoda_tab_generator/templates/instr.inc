@@ -79,7 +79,7 @@
 
 /**
  */
-function mmoda_{{ instrument_name }}($form, &$form_state)
+function mmoda_{{ frontend_name }}($form, &$form_state)
 {
   $form = array();
 
@@ -90,7 +90,7 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
   $form['#action'] = '{{ form_dispatcher_url }}';
   $form['#method'] = 'POST';
   $form['#attributes'] = array(
-    'class' => '{{ instrument_name }}-form'
+    'class' => '{{ frontend_name }}-form'
   );
 
   $form['instrument'] = array(
@@ -99,7 +99,7 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
   );
 
   $mmoda_settings = variable_get('mmoda_settings');
-  $instrument_defaults = $mmoda_settings['instruments']['{{ instrument_name }}'];
+  $instrument_defaults = $mmoda_settings['instruments']['{{ frontend_name }}'];
 
   $form['query_type'] = array(
     '#type' => 'hidden',
@@ -144,7 +144,7 @@ function mmoda_{{ instrument_name }}($form, &$form_state)
     '#prefix' => '<hr class="hr-default" />'
   );
 
-  form_load_include($form_state, 'inc', 'mmoda', 'mmoda.{{ instrument_name }}');
+  form_load_include($form_state, 'inc', 'mmoda', 'mmoda.{{ frontend_name }}');
 
   return ($form);
 }

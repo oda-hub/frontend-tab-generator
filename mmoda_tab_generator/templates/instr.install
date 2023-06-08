@@ -8,12 +8,12 @@ $module_name = basename(__FILE__, '.install');
 list ($core_module_name) = explode('_', $module_name);
 include_once drupal_get_path('module', $core_module_name) . '/' . $core_module_name . '.lib.inc';
 
-function mmoda_{{ instrument_name }}_instrument_info()
+function mmoda_{{ frontend_name }}_instrument_info()
 {
   $info = array(
-    'name' => '{{ instrument_name }}',
+    'name' => '{{ frontend_name }}',
     'messenger' => '{{ messenger }}',
-    'title' => '{{ instrument_name|capitalize }}'
+    'title' => '{{ instrument_title }}'
   );
 
   return $info;
@@ -22,7 +22,7 @@ function mmoda_{{ instrument_name }}_instrument_info()
 /**
  * Implements hook_requirements().
  */
-function mmoda_{{ instrument_name }}_requirements($phase)
+function mmoda_{{ frontend_name }}_requirements($phase)
 {
   $requirements = array();
   $conflicts = array();
@@ -33,9 +33,9 @@ function mmoda_{{ instrument_name }}_requirements($phase)
   return $requirements;
 }
 
-function mmoda_{{ instrument_name }}_install()
+function mmoda_{{ frontend_name }}_install()
 {
-  $instrument_info = mmoda_{{ instrument_name }}_instrument_info();
+  $instrument_info = mmoda_{{ frontend_name }}_instrument_info();
 
   $module_settings = array(
     'enabled' => TRUE,
@@ -58,10 +58,10 @@ function mmoda_{{ instrument_name }}_install()
 /**
  * Implements hook_uninstall().
  */
-function mmoda_{{ instrument_name }}_uninstall()
+function mmoda_{{ frontend_name }}_uninstall()
 {
   $module_name = basename(__FILE__, '.install');
-  $instrument = mmoda_{{ instrument_name }}_instrument_info()['name'];
+  $instrument = mmoda_{{ frontend_name }}_instrument_info()['name'];
   _mmoda_common_uninstall($module_name, $instrument);
 }
 
