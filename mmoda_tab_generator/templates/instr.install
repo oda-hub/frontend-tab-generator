@@ -45,7 +45,7 @@ function mmoda_{{ frontend_name }}_install()
     {% for k, v in defaults %}
     '{{ k }}' => {{ v | tojson }},
     {% endfor %} 
-    'acknowledgement' => 'ACKNOWLEDGEMENT PLACEHOLDER', {# TODO: #}
+    'acknowledgement' => '{{ citation }}',
     'enable_use_catalog' => FALSE, {# TODO: #}
     'allowed_roles' => '{{ roles }}',
   );
