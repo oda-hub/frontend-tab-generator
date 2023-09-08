@@ -38,6 +38,8 @@ class MMODATabGenerator:
                                    params = params)
                 if res.status_code == 200:
                     return json.loads(res.text)
+                else:
+                    raise RuntimeError('%s instrument metadata request status code %s', instrument_name, res.status_code)
             except Exception as e:
                 time.sleep(10)
                 continue
