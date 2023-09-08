@@ -41,6 +41,7 @@ class MMODATabGenerator:
                 else:
                     raise RuntimeError('%s instrument metadata request status code %s', instrument_name, res.status_code)
             except Exception as e:
+                logger.error('Error getting %s metadata from dispatcher (attempt %s): %s', instrument_name, num_try+1, repr(e))
                 time.sleep(10)
                 continue
         raise RuntimeError('Unable to get data from dispatcher. Exception was %s', repr(e))
