@@ -38,10 +38,10 @@ class MMODATabGenerator:
                                    params = params)
                 if res.status_code == 200:
                     return json.loads(res.text)
-            except:
+            except Exception as e:
                 time.sleep(10)
                 continue
-        raise RuntimeError('Unable to get data from dispatcher')
+        raise RuntimeError('Unable to get data from dispatcher. Exception was %s', repr(e))
 
     def _arrange_data(self, instrument_name):
         jmeta = self._request_data(instrument_name)
