@@ -84,7 +84,17 @@ class MMODATabGenerator:
         return param_dict, products_list
 
 
-    def generate(self, instrument_name, instruments_dir_path, frontend_name, title, messenger, roles, form_dispatcher_url, weight, citation):
+    def generate(self, 
+                 instrument_name, 
+                 instruments_dir_path, 
+                 frontend_name, 
+                 title, 
+                 messenger, 
+                 roles, 
+                 form_dispatcher_url, 
+                 weight, 
+                 citation = '',
+                 help_page = None):
         param_dict, products_list = self._arrange_data(instrument_name)
         
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
@@ -122,6 +132,11 @@ class MMODATabGenerator:
                                   param_dict = param_dict,
                                   products_list = products_list))
         
+        if help_page is not None:
+            help_book_dir = os.path.join(this_instr_path, 'help_book')
+            os.makedirs(help_book_dir, exist_ok=True)
+            with open(os.path.join(help_book_dir, f"mmoda_{frontend_name}_help.html"), 'w') as fd:
+                fd.write(help_page)
 
 
 def main():
