@@ -16,7 +16,8 @@ class MMODATabGenerator:
     def __init__(self, dispatcher_url):
         self.dispatcher_url = dispatcher_url
         
-    def _request_data(self, instrument_name, num_try = 5):
+    def _request_data(self, instrument_name, num_try = 5, sleep_base=10, sleep_multiplier=2):
+        sleep_time = sleep_base
         for n in range(num_try):        
             try:
                 secret_key = os.getenv('ODA_JWT_SECRET')
@@ -42,7 +43,8 @@ class MMODATabGenerator:
                     raise RuntimeError('%s instrument metadata request status code %s', instrument_name, res.status_code)
             except Exception as e:
                 logger.error('Error getting %s metadata from dispatcher (attempt %s): %s', instrument_name, num_try+1, repr(e))
-                time.sleep(10)
+                time.sleep(sleep_time)
+                sleep_time *= sleep_multiplier
                 continue
         raise RuntimeError('Unable to get data from dispatcher. Exception was %s', repr(e))
 
