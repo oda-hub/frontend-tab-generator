@@ -4,5 +4,8 @@ core = 7.x
 dependencies[] = mmoda
 
 files[] = mmoda_{{ frontend_name }}.inc
+{% if stylesheet is defined and stylesheet is not none -%}
+stylesheets[all][] = {{ stylesheet }}
+{% endif -%}
 
 configure = admin/config/mmoda/{{ frontend_name }}

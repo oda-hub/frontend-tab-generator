@@ -1,3 +1,4 @@
+{% from 'euclid/macros.j2' import euclid_form_field %}
 {% macro formfield(par_name, par_detail) -%}
   $form['{{ par_name }}'] = array(
     {% if par_detail['value'].__class__.__name__ == 'bool' %}
@@ -12,7 +13,7 @@
       {% for val in par_detail['restrictions']['allowed_values'] %}
       '{{ val }}' => '{{ val }}',
       {% endfor %}
-    ),    
+    ),
     {% else %}
     '#type' => 'textfield',
     {% endif %}
@@ -135,7 +136,11 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
   );
 
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
-    {{ formfield(par_name, par_detail) }}
+    {% if euclid_table_parname is not none and par_name == euclid_table_parname %}
+      {{ euclid_form_field(par_name) }}
+    {% else %}
+      {{ formfield(par_name, par_detail) }}
+    {% endif %}
   {% endfor %}
 
   $form['submit'] = array(
