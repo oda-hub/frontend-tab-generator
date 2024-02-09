@@ -1,3 +1,4 @@
+{% import 'euclid/macros.j2' as euclid %}
 <?php
 
 /**
@@ -5,6 +6,7 @@
  * Install, update and uninstall functions for the mmoda module.
  */
 $module_name = basename(__FILE__, '.install');
+$current_dir = drupal_get_path('module', $module_name);
 list ($core_module_name) = explode('_', $module_name);
 include_once drupal_get_path('module', $core_module_name) . '/' . $core_module_name . '.lib.inc';
 
@@ -26,7 +28,11 @@ function mmoda_{{ frontend_name }}_requirements($phase)
 {
   $requirements = array();
   $conflicts = array();
-  if ('install' == $phase) {}
+  if ('install' == $phase) {
+    {% if is_euclid %}
+      {{ euclid.filters_file_req(euclid_csv_name) }}
+    {% endif %}
+  }
 
   if ($phase == 'runtime') {}
 
@@ -51,6 +57,10 @@ function mmoda_{{ frontend_name }}_install()
   );
   $module_settings= array_merge($instrument_info, $module_settings);
 
+  {% if is_euclid %}
+    {{ euclid.install_filters(euclid_csv_name, euclid_table_parname) }}
+  {% endif %}
+
   $module_name = basename(__FILE__, '.install');
   _mmoda_common_install($module_name, $instrument_info['name'], $module_settings);
 }
@@ -65,3 +75,6 @@ function mmoda_{{ frontend_name }}_uninstall()
   _mmoda_common_uninstall($module_name, $instrument);
 }
 
+  {% if is_euclid %}
+    {{ euclid.read_filters_func() }}
+  {% endif %}

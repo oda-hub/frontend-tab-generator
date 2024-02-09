@@ -1,0 +1,107 @@
+{% macro filters_file_req(filters_csv_name) -%}
+$module_name = basename(__FILE__, '.install');
+$current_dir = drupal_get_path('module', $module_name);
+$filters = array();
+if (_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters))
+  $requirements[$module_name] = array(
+    'title' => t('A valid Euclid filters CSV file'),
+    'description' => t('The Euclid filters file euclid-filters.csv must be present in the module root directory and it must be valid.'),
+    'severity' => REQUIREMENT_ERROR
+  );
+{%- endmacro -%}
+
+{% macro install_filters(filters_csv_name, filters_par_name) -%}
+$module_name = basename(__FILE__, '.install');
+$current_dir = drupal_get_path('module', $module_name);
+$filters = array();
+_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters);
+unset($filters['Instrument']);
+$module_settings['{{ filters_par_name }}']=$filters;
+{%- endmacro -%}
+
+{% macro read_filters_func() -%}
+function _mmoda_euclid_read_filters_file($filename, &$filters)
+{
+  if (! $f = fopen($filename, "r")) {
+    $error_message = 'Error, can not read Euclid filters file :' . $filename;
+    error_log($error_message);
+    watchdog('MMODA_EUCLID', $error_message);
+    return (1);
+  }
+  // read file line by line until the end of file (feof)
+  $i = 1;
+  while (! feof($f)) {
+    $values = fgetcsv($f);
+    if ($values !== false and count($values) == 2) {
+      if (! array_key_exists($values[0], $filters))
+        $filters[$values[0]] = array();
+      array_push($filters[$values[0]], $values[1]);
+    }
+    elseif ($values === false and !feof($f)) {
+      $error_message = "Error, bad CSV file, line $i :" . $filename;
+      error_log($error_message);
+      watchdog('MMODA_EUCLID', $error_message);
+      return (1);
+    }
+    $i ++;
+  }
+  fclose($f);
+  return (0);
+}
+{%- endmacro -%}
+
+{# TODO: prefix-suffix, visibility etc #}
+{% macro euclid_form_field(filters_par_name) -%}
+$instruments_filters = array();
+foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filters) {
+  if (! array_key_exists($instrument, $instruments_filters))
+    $instruments_filters[$instrument] = array();
+  foreach ($filters as $filter) {
+    $instruments_filters[$instrument][$instrument . '|' . $filter] = $filter;
+  }
+}
+
+$form['{{ filters_par_name }}'] = array(
+  '#type' => 'container',
+  '#title' => t('Filters'),
+  '#attributes' => array(
+    'class' => array(
+      'euclid-instruments-filters multivalued-field'
+    )
+  ),
+  '#suffix' => '<hr>'
+);
+
+$form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
+  '#type' => 'select',
+  '#title' => t('Filter'),
+  '#required' => TRUE,
+  '#options' => $instruments_filters,
+  '#parent_classes' => array(
+    'col-md-4'
+  ),
+  '#prefix' => '<hr><label class="control-label">Filters</label>' . '<div class="row form-group multivalued-value">'
+);
+$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
+  '#type' => 'textfield',
+  '#title' => t('Flux column name'),
+  '#required' => TRUE,
+  '#parent_classes' => array(
+    'col-md-3 '
+  )
+);
+$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
+  '#type' => 'textfield',
+  '#title' => t('Flux error column name'),
+  '#required' => TRUE,
+  '#parent_classes' => array(
+    'col-md-3'
+  ),
+  '#suffix' => '</div>'
+);
+
+drupal_add_js(array(
+    'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
+  ), 'setting');
+
+{%- endmacro -%}

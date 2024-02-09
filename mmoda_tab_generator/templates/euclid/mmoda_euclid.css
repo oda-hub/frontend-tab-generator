@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+.euclid-instruments-filters .form-item {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.euclid-instruments-filters .form-control, .euclid-instruments-filters select {
+  padding-right: inherit !important;
+  padding-left: 6px;
+  width: 90% !important;
+}

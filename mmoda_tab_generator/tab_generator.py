@@ -85,7 +85,22 @@ class MMODATabGenerator:
 
         return param_dict, products_list
 
-
+    @staticmethod
+    def _check_euclid(param_dict):
+        euclid_table_uri = 'http://odahub.io/ontology#PhosphorosFiltersTable' 
+        
+        is_euclid = False
+        euclid_table_parname = None
+        euclid_filters_list = None
+        
+        for pname, pval in param_dict.items():
+            if euclid_table_uri in pval.get('owl_uri', []):
+                is_euclid = True
+                euclid_table_parname = pname
+                euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
+        
+        return is_euclid, euclid_table_parname, euclid_filters_list
+    
     def generate(self, 
                  instrument_name, 
                  instruments_dir_path, 
@@ -102,13 +117,31 @@ class MMODATabGenerator:
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
         os.makedirs(this_instr_path, exist_ok=True)
         basename = os.path.join(this_instr_path, f"mmoda_{frontend_name}")
+
+        css_fname = None
+        euclid_csv_name = 'euclid_filters.csv'
+        
+        is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
         
         jenv = Environment(loader=PackageLoader('mmoda_tab_generator')) 
-
+        
+        if is_euclid:
+            css_fname = "mmoda_euclid.css"
+            templ = jenv.get_template('euclid/mmoda_euclid.css')
+            with open(os.path.join(this_instr_path, css_fname), 'w') as fd:
+                fd.write(templ.render())
+                
+            with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
+                fd.write('Instrument,Filter\n')
+                for flt in euclid_filters_list:
+                    fd.write(','.join(flt.split('|'))+'\n')
+            
         templ = jenv.get_template('instr.info')
         with open(f"{basename}.info", 'w') as fd:
             fd.write(templ.render(frontend_name = frontend_name,
-                                  instrument_title = title))
+                                  instrument_title = title,
+                                  stylesheet = css_fname
+                                  ))
 
         templ = jenv.get_template('instr.module')
         with open(f"{basename}.module", 'w') as fd:
@@ -119,12 +152,15 @@ class MMODATabGenerator:
         with open(f"{basename}.install", 'w') as fd:
             fd.write(templ.render(frontend_name = frontend_name,
                                   instrument_title = title,
-                                  defaults = [(k, v['value']) for k, v in param_dict.items()], 
+                                  defaults = [(k, v['value']) for k, v in param_dict.items() if k != euclid_table_parname], 
                                   default_product_type = products_list[0],
                                   roles = roles,
                                   weight=weight,
                                   messenger=messenger,
-                                  citation=citation))
+                                  citation=citation,
+                                  is_euclid=is_euclid,
+                                  euclid_csv_name=euclid_csv_name,
+                                  euclid_table_parname=euclid_table_parname))
 
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
@@ -132,7 +168,8 @@ class MMODATabGenerator:
                                   frontend_name = frontend_name,
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
-                                  products_list = products_list))
+                                  products_list = products_list,
+                                  euclid_table_parname = euclid_table_parname))
         
         if help_page is not None:
             help_book_dir = os.path.join(this_instr_path, 'help_book')
