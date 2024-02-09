@@ -149,10 +149,17 @@ class MMODATabGenerator:
                                   instrument_title = title))
 
         templ = jenv.get_template('instr.install')
+        defaults = []
+        for k, v in param_dict.items():
+            if k != euclid_table_parname:
+                if isinstance(v['value'], bool):
+                    defaults.append(k, int(v['value']))
+                else:
+                    defaults.append(k, v['value'])
         with open(f"{basename}.install", 'w') as fd:
             fd.write(templ.render(frontend_name = frontend_name,
                                   instrument_title = title,
-                                  defaults = [(k, v['value']) for k, v in param_dict.items() if k != euclid_table_parname], 
+                                  defaults = defaults, 
                                   default_product_type = products_list[0],
                                   roles = roles,
                                   weight=weight,

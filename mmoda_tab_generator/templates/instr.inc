@@ -4,8 +4,8 @@
     {% if par_detail['value'].__class__.__name__ == 'bool' %}
     '#type' => 'radios',
     '#options' => array(
-      True => 'True',
-      False => 'False'
+      1 => 'True',
+      0 => 'False'
     ),
     {% elif 'restrictions' in par_detail and par_detail['restrictions']['allowed_values'] is defined %}
     '#type' => 'select',
