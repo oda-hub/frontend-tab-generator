@@ -4,8 +4,8 @@
     {% if par_detail['value'].__class__.__name__ == 'bool' %}
     '#type' => 'radios',
     '#options' => array(
-      True => 'True',
-      False => 'False'
+      1 => 'True',
+      0 => 'False'
     ),
     {% elif 'restrictions' in par_detail and par_detail['restrictions']['allowed_values'] is defined %}
     '#type' => 'select',
@@ -17,7 +17,7 @@
     {% else %}
     '#type' => 'textfield',
     {% endif %}
-    '#title' => t("{{ par_name }}"),
+    '#title' => t("{{ par_name|capitalize|replace("_"," ") }}"),
     '#default_value' => $instrument_defaults['{{ par_name }}'],
     {% if par_detail.units and par_detail.units != 'str' %}
     '#field_suffix' => t("{{ par_detail.units }}"),
