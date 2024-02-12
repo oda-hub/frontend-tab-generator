@@ -153,9 +153,9 @@ class MMODATabGenerator:
         for k, v in param_dict.items():
             if k != euclid_table_parname:
                 if isinstance(v['value'], bool):
-                    defaults.append(k, int(v['value']))
+                    defaults.append((k, int(v['value'])))
                 else:
-                    defaults.append(k, v['value'])
+                    defaults.append((k, v['value']))
         with open(f"{basename}.install", 'w') as fd:
             fd.write(templ.render(frontend_name = frontend_name,
                                   instrument_title = title,
