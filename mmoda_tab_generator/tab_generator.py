@@ -15,38 +15,49 @@ logger = logging.getLogger(__name__)
 class MMODATabGenerator:
     def __init__(self, dispatcher_url):
         self.dispatcher_url = dispatcher_url
+
+    def _get_token(self):
+        secret_key = os.getenv('ODA_JWT_SECRET')
+        if secret_key:
+            token_payload = {'sub': 'oda-bot@odahub.io',
+                             'email': 'oda-bot@odahub.io',
+                             'name': 'oda-bot',
+                             'roles': 'oda workflow developer',
+                             'exp': time.time()+300}
+            token = jwt.encode(token_payload, secret_key, algorithm='HS256') # TODO: hardcoded algorithm
+        else:
+            logger.warning('Will try to get instrument meta-data as unauthenticated user.')
+            token = None
+
+        return token
+
         
     def _request_data(self, instrument_name, num_try = 5, sleep_base=10, sleep_multiplier=2):
         sleep_time = sleep_base
-        for n in range(num_try):        
-            try:
-                secret_key = os.getenv('ODA_JWT_SECRET')
-                if secret_key:
-                    token_payload = {'sub': 'oda-bot@odahub.io',
-                                     'email': 'oda-bot@odahub.io',
-                                     'name': 'oda-bot',
-                                     'roles': 'oda workflow developer',
-                                     'exp': time.time()+300}
-                    token = jwt.encode(token_payload, secret_key, algorithm='HS256') # TODO: hardcoded algorithm
-                else:
-                    logger.warning('Will try to get instrument meta-data as unauthenticated user.')
-                    token = None
+        meta_data_url = '/'.join([self.dispatcher_url.strip('/'), 'api/meta-data'])
+        params = {'instrument': instrument_name}
+        exceptions = []
                 
-                params = {'instrument': instrument_name}
-                if token is not None: 
-                    params['token'] = token
-                res = requests.get('/'.join([self.dispatcher_url.strip('/'), 'api/meta-data']),
-                                   params = params)
+        for n in range(num_try):
+            token = self._get_token()
+            if token is not None: 
+                params['token'] = token
+
+            try:
+                res = requests.get(meta_data_url, params = params)
                 if res.status_code == 200:
                     return json.loads(res.text)
                 else:
-                    raise RuntimeError('%s instrument metadata request status code %s', instrument_name, res.status_code)
+                    raise RuntimeError('%s instrument metadata URL %s request status code %s', instrument_name, meta_data_url, res.status_code)
+
             except Exception as e:
-                logger.error('Error getting %s metadata from dispatcher (attempt %s): %s', instrument_name, num_try+1, repr(e))
+                logger.error('Error getting %s metadata from dispatcher URL: %s (attempt %s): %s', instrument_name, meta_data_url, num_try+1, repr(e))
+                exceptions.append(e)
                 time.sleep(sleep_time)
                 sleep_time *= sleep_multiplier
                 continue
-        raise RuntimeError('Unable to get data from dispatcher. Exception was %s', repr(e))
+
+        raise RuntimeError('Unable to get data from dispatcher. Exceptions were %s', repr(exceptions))
 
     def _arrange_data(self, instrument_name):
         jmeta = self._request_data(instrument_name)
