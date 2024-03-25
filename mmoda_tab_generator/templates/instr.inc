@@ -96,7 +96,11 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
 
   $form['instrument'] = array(
     '#type' => 'hidden',
-    '#value' => '{{ dispatcher_name }}'
+    '#value' => '{{ dispatcher_name }}',
+    '#attributes' => array(
+      'integral_instrument' => 'false',
+      'support_return_progress' => 'true'
+    )
   );
 
   $mmoda_settings = variable_get('mmoda_settings');
