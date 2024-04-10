@@ -14,6 +14,8 @@
       '{{ val }}' => '{{ val }}',
       {% endfor %}
     ),
+    {% elseif par_detail['value'].__class__.__name__ == 'LongString' %}
+    '#type' => 'textarea',
     {% else %}
     '#type' => 'textfield',
     {% endif %}
