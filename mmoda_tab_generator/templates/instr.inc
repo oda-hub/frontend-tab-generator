@@ -17,7 +17,7 @@
     {% else %}
     '#type' => 'textfield',
     {% endif %}
-    '#title' => t("{{ par_name|capitalize|replace("_"," ") }}"),
+    '#title' => t("{{ par_name }}"),
     '#default_value' => $instrument_defaults['{{ par_name }}'],
     {% if par_detail.units and par_detail.units != 'str' %}
     '#field_suffix' => t("{{ par_detail.units }}"),
