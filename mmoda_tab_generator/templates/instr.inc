@@ -44,6 +44,13 @@
     {% endif %} 
     '#attributes' => array(
       'name' => $mform_id . '{{ par_name }}',
+
+      {% if par_detail['value'].__class__.__name__ == 'LongString' %}
+          'maxlength' => '10000',
+          'class' => array(
+              'form-control'
+          )
+      {% endif %}
       
       {% if 'restrictions' in par_detail %}
           {% if par_detail['restrictions']['min_value'] is defined and par_detail['restrictions']['max_value'] is defined %}
