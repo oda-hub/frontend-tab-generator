@@ -16,6 +16,8 @@
     ),
     {% elseif par_detail['value'].__class__.__name__ == 'LongString' %}
     '#type' => 'textarea',
+    '#cols' => 60,
+    '#rows' => 5,
     {% else %}
     '#type' => 'textfield',
     {% endif %}
