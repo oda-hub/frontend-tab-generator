@@ -14,9 +14,9 @@
       '{{ val }}' => '{{ val }}',
       {% endfor %}
     ),
-    {% elseif par_detail['value'].__class__.__name__ == 'LongString' %}
+    {% elif 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}
     '#type' => 'textarea',
-    '#cols' => 60,
+    '#cols' => 100,
     '#rows' => 5,
     {% else %}
     '#type' => 'textfield',
@@ -47,7 +47,7 @@
     '#attributes' => array(
       'name' => $mform_id . '{{ par_name }}',
 
-      {% if par_detail['value'].__class__.__name__ == 'LongString' %}
+      {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}
           'maxlength' => '10000',
           'class' => array(
               'form-control'
@@ -73,7 +73,7 @@
     ),
     '#parent_classes' => array(
       'form-group',
-      'col-md-6'
+      {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}'col-md-12'{% else %}'col-md-6'{% endif %}
     ),
     '#label_classes' => array(
       'control-label'
