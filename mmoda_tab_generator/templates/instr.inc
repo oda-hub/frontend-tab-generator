@@ -14,6 +14,10 @@
       '{{ val }}' => '{{ val }}',
       {% endfor %}
     ),
+    {% elif 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}
+    '#type' => 'textarea',
+    '#cols' => 100,
+    '#rows' => 5,
     {% else %}
     '#type' => 'textfield',
     {% endif %}
@@ -42,6 +46,13 @@
     {% endif %} 
     '#attributes' => array(
       'name' => $mform_id . '{{ par_name }}',
+
+      {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}
+          'maxlength' => '10000',
+          'class' => array(
+              'form-control'
+          )
+      {% endif %}
       
       {% if 'restrictions' in par_detail %}
           {% if par_detail['restrictions']['min_value'] is defined and par_detail['restrictions']['max_value'] is defined %}
@@ -62,7 +73,7 @@
     ),
     '#parent_classes' => array(
       'form-group',
-      'col-md-6'
+      {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}'col-md-12'{% else %}'col-md-6'{% endif %}
     ),
     '#label_classes' => array(
       'control-label'
