@@ -122,6 +122,8 @@ class MMODATabGenerator:
                  form_dispatcher_url, 
                  weight, 
                  citation = '',
+                 instrument_version=None,
+                 instrument_version_link=None,
                  help_page = None):
         param_dict, products_list = self._arrange_data(instrument_name)
         
@@ -176,6 +178,8 @@ class MMODATabGenerator:
                                   weight=weight,
                                   messenger=messenger,
                                   citation=citation,
+                                  instrument_version=instrument_version,
+                                  instrument_version_link=instrument_version_link,
                                   is_euclid=is_euclid,
                                   euclid_csv_name=euclid_csv_name,
                                   euclid_table_parname=euclid_table_parname))
