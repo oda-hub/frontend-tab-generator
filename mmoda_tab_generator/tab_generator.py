@@ -236,8 +236,6 @@ def main():
     citation = args.citation
     instrument_version = args.instrument_version
     instrument_version_link = args.instrument_version_link
-
-
     
     generator = MMODATabGenerator(dispatcher_url)
     generator.generate(instrument_name, 
