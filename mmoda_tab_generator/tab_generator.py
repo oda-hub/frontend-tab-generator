@@ -122,6 +122,8 @@ class MMODATabGenerator:
                  form_dispatcher_url, 
                  weight, 
                  citation = '',
+                 instrument_version=None,
+                 instrument_version_link=None,
                  help_page = None):
         param_dict, products_list = self._arrange_data(instrument_name)
         
@@ -176,6 +178,8 @@ class MMODATabGenerator:
                                   weight=weight,
                                   messenger=messenger,
                                   citation=citation,
+                                  instrument_version=instrument_version,
+                                  instrument_version_link=instrument_version_link,
                                   is_euclid=is_euclid,
                                   euclid_csv_name=euclid_csv_name,
                                   euclid_table_parname=euclid_table_parname))
@@ -209,6 +213,8 @@ def main():
     parser.add_argument('--form_dispatcher_url', default='dispatch-data/run_analysis')
     parser.add_argument('-w', required=True)
     parser.add_argument('--citation', default='Service provided by <a href="https://github.com/oda-hub" target="_blank">MMODA</a>')
+    parser.add_argument('--instrument_version', default=None)
+    parser.add_argument('--instrument_version_link', default=None)
     args = parser.parse_args()
     
     if not args.config:
@@ -228,6 +234,8 @@ def main():
     weight = args.w
     messenger = args.messenger
     citation = args.citation
+    instrument_version = args.instrument_version
+    instrument_version_link = args.instrument_version_link
     
     generator = MMODATabGenerator(dispatcher_url)
     generator.generate(instrument_name, 
@@ -238,7 +246,9 @@ def main():
                        roles, 
                        form_dispatcher_url,
                        weight,
-                       citation)
+                       citation,
+                       instrument_version,
+                       instrument_version_link)
     
 if __name__ == '__main__':
     main()

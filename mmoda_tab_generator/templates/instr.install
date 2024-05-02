@@ -50,7 +50,12 @@ function mmoda_{{ frontend_name }}_install()
     'product_type' => '{{ default_product_type }}',
     {% for k, v in defaults %}
     '{{ k }}' => {{ v | tojson }},
-    {% endfor %} 
+    {% endfor %}
+    {% if instrument_version is not none and instrument_version_link is not none %}
+        'instrument_version' => '<a target="_blank" href="{{ instrument_version_link }}">{{ instrument_version }}</a>',
+    {% elif instrument_version is not none and instrument_version_link is none %}
+        'instrument_version' => '{{ instrument_version }}',
+    {% endif %}
     'acknowledgement' => '{{ citation }}',
     'enable_use_catalog' => FALSE, {# TODO: #}
     'allowed_roles' => '{{ roles }}',
