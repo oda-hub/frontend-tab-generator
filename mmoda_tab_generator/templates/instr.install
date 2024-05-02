@@ -52,11 +52,9 @@ function mmoda_{{ frontend_name }}_install()
     '{{ k }}' => {{ v | tojson }},
     {% endfor %}
     {% if instrument_version is not none and instrument_version_link is not none %}
-        {% if instrument_version_link is not none %}
-            'instrument_version' => '<a target="_blank" href="{{ instrument_version_link }}">{{ instrument_version }}</a>',
-        {% else %}
-            'instrument_version' => '{{ instrument_version }}',
-        {% endif %}
+        'instrument_version' => '<a target="_blank" href="{{ instrument_version_link }}">{{ instrument_version }}</a>',
+    {% elif instrument_version is not none and instrument_version_link is none %}
+        'instrument_version' => '{{ instrument_version }}',
     {% endif %}
     'acknowledgement' => '{{ citation }}',
     'enable_use_catalog' => FALSE, {# TODO: #}
