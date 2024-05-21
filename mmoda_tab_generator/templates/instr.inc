@@ -18,7 +18,7 @@
     '#type' => 'textarea',
     '#cols' => 100,
     '#rows' => 5,
-    {% elif 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}
+    {% elif 'http://odahub.io/ontology#POSIXPath' in par_detail['owl_uri'] %}
     '#type' => 'file',
     {% else %}
     '#type' => 'textfield',
@@ -76,7 +76,7 @@
     '#parent_classes' => array(
       'form-group',
       {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}'col-md-12'
-      {% elif 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}'col-md-8'{% else %}
+      {% elif 'http://odahub.io/ontology#POSIXPath' in par_detail['owl_uri'] %}'col-md-8'{% else %}
       'col-md-6'{% endif %}
     ),
     '#label_classes' => array(
