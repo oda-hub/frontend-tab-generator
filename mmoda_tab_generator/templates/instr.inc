@@ -36,7 +36,11 @@
           ),
           {% endif %}
           '#attributes' => array(
+            {% if element == 'url' or element == 'file' %}
+            'name' => $mform_id . '{{ par_name }}',
+            {% else %}
             'name' => $mform_id . '{{ par_name }}_{{ element }}',
+            {% endif %}
           ),
           {% if element == 'type' %}
           '#options' => array(
