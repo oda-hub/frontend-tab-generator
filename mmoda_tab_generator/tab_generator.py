@@ -143,7 +143,12 @@ class MMODATabGenerator:
             templ = jenv.get_template('euclid/mmoda_euclid.css')
             with open(os.path.join(this_instr_path, css_fname), 'w') as fd:
                 fd.write(templ.render())
-                
+
+            js_fname = "mmoda_euclid.js"
+            templ = jenv.get_template('euclid/mmoda_euclid.js')
+            with open(os.path.join(this_instr_path, js_fname), 'w') as fd:
+                fd.write(templ.render())
+
             with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
                 fd.write('Instrument,Filter\n')
                 for flt in euclid_filters_list:
