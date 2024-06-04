@@ -50,8 +50,20 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 }
 {%- endmacro -%}
 
+
 {# TODO: prefix-suffix, visibility etc #}
 {% macro euclid_form_field(filters_par_name) -%}
+
+$form['{{ filters_par_name }}_fits_file'] = array(
+  '#type' => 'file',
+  '#title' => t('Upload a fits file',),
+  '#description' => t('Upload a fits file'),
+  '#parent_classes' => array(
+    'euclid-instruments-filters fits-file-container'
+  ),
+  '#prefix' => '<hr><label class="control-label">Filters</label>',
+);
+
 $instruments_filters = array();
 foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filters) {
   if (! array_key_exists($instrument, $instruments_filters))
@@ -80,7 +92,7 @@ $form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
   '#parent_classes' => array(
     'col-md-4'
   ),
-  '#prefix' => '<hr><label class="control-label">Filters</label>' . '<div class="row form-group multivalued-value">'
+  '#prefix' => '<label class="control-label">List of filters</label>' . '<div class="row form-group multivalued-value">'
 );
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
   '#type' => 'textfield',
