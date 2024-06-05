@@ -54,6 +54,8 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 {# TODO: prefix-suffix, visibility etc #}
 {% macro euclid_form_field(filters_par_name) -%}
 
+drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/mmoda_euclid.js');
+
 $form['{{ filters_par_name }}_fits_file'] = array(
   '#type' => 'file',
   '#title' => t('Upload a fits file',),

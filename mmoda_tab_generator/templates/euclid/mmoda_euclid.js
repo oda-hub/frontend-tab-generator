@@ -1,4 +1,3 @@
-{% from 'euclid/macros.j2' import euclid_form_field %}
 (function($) {
     $(document).ready(commonReady);
     // let fits_reader_wrapper = new FITSReaderWrapper();
@@ -19,14 +18,12 @@
     // customElements.define('fits-component', FITSSettingsComponent);
     // customElements.define('csv-component', CSVSettingsComponent);
     function commonReady() {
-    {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
-        {% if euclid_table_parname is not none and par_name == euclid_table_parname %}
-        $('#edit-{{ par_name }}-fits-file').on('change', function() {
-        // let fits_reader_wrapper = new FITSReaderWrapper(file_path);
-        // WrapperContainer.setFITSReaderWrapper(fits_reader_wrapper);
+        $('.euclid-instruments-filters.fits-file-container input').on('change', function() {
+            // let fits_reader_wrapper = new FITSReaderWrapper(file_path);
+            // WrapperContainer.setFITSReaderWrapper(fits_reader_wrapper);
+            let fileName = $(this).val().split('\\').pop();
+            console.log(fileName);
         });
-        {% endif %}
-    {% endfor %}
     }
 })(jQuery);
 
