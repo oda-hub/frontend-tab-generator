@@ -1,22 +1,5 @@
 (function($) {
     $(document).ready(commonReady);
-    // let fits_reader_wrapper = new FITSReaderWrapper();
-
-    // let bokeh_wrapper = new BokehWrapper();
-
-    // let d3_wrapper = new D3Wrapper();
-
-    // WrapperContainer.setBokehWrapper(bokeh_wrapper);
-    // WrapperContainer.setD3Wrapper(d3_wrapper);
-
-    // VisualizationContainer.setBokehVisualization(new BokehGraph());
-    // VisualizationContainer.setD3Visualization(new D3Graph());
-
-    // customElements.define('file-component', FileComponent);
-    // customElements.define('settings-component', SettingsComponent);
-    // customElements.define('visualization-component', VisualizationComponent);
-    // customElements.define('fits-component', FITSSettingsComponent);
-    // customElements.define('csv-component', CSVSettingsComponent);
     function getFile(file_path) {
         return fetch(file_path)
             .then((response) => {
@@ -53,13 +36,14 @@
     }
 
     function commonReady() {
-        $('.euclid-instruments-filters.fits-file-container input').on('change', function() {
-            // let fits_reader_wrapper = new FITSReaderWrapper(file_path);
-            // WrapperContainer.setFITSReaderWrapper(fits_reader_wrapper);
-            let fileName = $(this).val().split('\\').pop();
-            // console.log(fileName);
-            getFile(fileName);
+        let file_input = document.querySelectorAll('.euclid-instruments-filters.fits-file-container input');
+        file_input[0].addEventListener('change', function(event) {
+            let file = event.target.files[0];
+            file.arrayBuffer().then(arrayBuffer => {
+                readFile(arrayBuffer);
+            }).catch(error => {
+                console.error('Error reading file as ArrayBuffer:', error);
+            });
         });
-
     }
 })(jQuery);
