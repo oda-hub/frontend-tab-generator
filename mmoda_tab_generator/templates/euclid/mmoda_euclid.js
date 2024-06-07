@@ -18,8 +18,8 @@
         //Position of the header and data unit
         let hdu_index = 1;
 
-	    let hdu = fits_file.getHDU(hdu_index);
-        // let hdu = fits_file.hdus[hdu_index];
+	    // let hdu = fits_file.getHDU(hdu_index);
+        let hdu = fits_file.hdus[hdu_index];
 
 	    let header = hdu.header;
 	    let data = hdu.data;
