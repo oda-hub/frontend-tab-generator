@@ -57,12 +57,6 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/fits-reader/dist/fits-reader/fits-reader.js');
 drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/mmoda_euclid.js');
 
-/**
-drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/astrojsvis/prototypes/jsvis/_vendors/fits-reader.js');
-drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/astrojsvis/prototypes/jsvis/wrappers/FITSReaderWrapper.js');
-drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/astrojsvis/prototypes/jsvis/containers/WrapperContainer.js');
-*/
-
 $form['{{ filters_par_name }}_fits_file'] = array(
   '#type' => 'file',
   '#title' => t('Upload a fits file',),
