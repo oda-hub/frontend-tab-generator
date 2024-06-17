@@ -25,14 +25,19 @@
 
         let card_name = "CARDNAME";
 
-	    //Get a specific card value
-	    let card_value = header.get(card_name);
+//	    //Get a specific card value
+//	    let card_value = header.get(card_name);
+//
+//	    let col_name = "column";
+//
+//	    //Specific to BINTABLE and TABLE extension
+//	    let col_data;
+//	    data.getColumn(col_name, function(col){col_data = col});
 
-	    let col_name = "column";
-
-	    //Specific to BINTABLE and TABLE extension
-	    let col_data;
-	    data.getColumn(col_name, function(col){col_data = col});
+        let select_filter_flux = document.getElementById(id_selector.replace("file", "flux-"));
+        select_filter_flux.innerHTML = data.columns.map(option => `<option value="${option}">${option}</option>`).join('');
+        let select_filter_flux_error = document.getElementById(id_selector.replace("file", "flux-error-"));
+        select_filter_flux_error.innerHTML = data.columns.map(option => `<option value="${option}">${option}</option>`).join('');
     }
 
     function commonReady() {
