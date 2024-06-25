@@ -5,6 +5,9 @@
       $form['{{ par_name }}_{{ element }}'] = array(
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
         '#title' => t({% if element == 'type' %}'{{ par_name }}'{% elif element == 'url' %}'File URL'{% else %}'Upload a file'{% endif %},),
+        {% if element == 'url' %}
+        '#default_value' => t($instrument_defaults['{{ par_name }}']),
+        {% endif %}
         {% if 'products' in par_detail %}
           '#states' => array(
             {% set ns = namespace(prod_sets = []) %}
