@@ -5,7 +5,7 @@
       $form['{{ par_name }}_{{ element }}'] = array(
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
         '#title' => t({% if element == 'type' %}'{{ par_name }}'{% elif element == 'url' %}'File URL'{% else %}'Upload a file'{% endif %},),
-        {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] and t($instrument_defaults['{{ par_name }}']) != '' %}
+        {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
         '#default_value' => t($instrument_defaults['{{ par_name }}']),
         {% endif %}
         {% if 'products' in par_detail %}
@@ -50,7 +50,7 @@
             'file' => t('Upload a file'),
             'url' => t('Provide a URL')
           ),
-            {% if t($instrument_defaults['{{ par_name }}']) != '' %}
+            {% if 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
           '#default_value' => 'url',
             {% else %}
           '#default_value' => 'file',
