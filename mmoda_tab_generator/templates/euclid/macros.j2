@@ -66,58 +66,128 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
   }
 }
 
-$form['{{ filters_par_name }}_fits_file'] = array(
-  '#type' => 'file',
-  '#title' => t('Upload a fits file',),
-  '#description' => t('Upload a fits file'),
-  '#parent_classes' => array(
-    'euclid-instruments-filters fits-file-container'
-  ),
-  '#prefix' => '<hr>',
-);
+    $form['{{ filters_par_name }}_fits_type'] = array(
+        '#type' => 'radios',
+        '#title' => t('{{ filters_par_name }} fits file'),
+        '#options' => array(
+            'file' => t('Upload a file'),
+            'url' => t('Provide a URL')
+        ),
+        '#default_value' => 'file',
+        '#parent_classes' => array(
+          'form-group',
+          'col-md-8'
+        ),
+        '#attributes' => array(
+          'name' => $mform_id . '{{ filters_par_name }}_fits_type',
+        ),
+        '#prefix' => '<div class="row">',
+        '#suffix' => '</div>'
+    );
 
-$form['{{ filters_par_name }}_fits'] = array(
-  '#type' => 'container',
-  '#title' => t('Filters from fits file'),
-  '#attributes' => array(
-    'class' => array(
-      'euclid-instruments-filters multivalued-field'
-    )
-  ),
-  '#suffix' => '<hr><label class="control-label">Filters loaded from fits file</label>'
-);
+    $form['{{ filters_par_name }}_fits_file'] = array(
+      '#type' => 'file',
+      '#title' => t('Upload a fits file',),
+      '#description' => t('Upload a fits file'),
+      '#states' => array(
+          'visible' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'file')
+                )
+            ),
+            'enabled' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'file')
+                )
+            )
+      ),
+      '#attributes' => array(
+        'name' => $mform_id . '{{ filters_par_name }}_fits_file'
+      ),
+      '#parent_classes' => array(
+        'euclid-instruments-filters fits-file-container'
+      ),
+    );
 
-$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
-  '#type' => 'select',
-  '#title' => t('Filter'),
-  '#required' => TRUE,
-  '#options' => $instruments_filters,
-  '#parent_classes' => array(
-    'col-md-4'
-  ),
-  '#prefix' => '<label class="control-label">List of filters</label>' . '<div class="row form-group multivalued-value">'
-);
-$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
-  '#type' => 'select',
-  '#title' => t('Flux column name'),
-  '#required' => TRUE,
-  '#options' => array(),
-  '#parent_classes' => array(
-    'col-md-3 '
-  )
-);
-$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
-  '#type' => 'select',
-  '#title' => t('Flux error column name'),
-  '#required' => TRUE,
-  '#options' => array(),
-  '#parent_classes' => array(
-    'col-md-3'
-  ),
-  '#suffix' => '</div>'
-);
+    $form['{{ filters_par_name }}_fits_url'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Fits file URL',),
+      '#description' => t('Provide the url of the fits file'),
+      '#states' => array(
+          'visible' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'url')
+                )
+            ),
+            'enabled' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'url')
+                )
+            )
+      ),
+      '#attributes' => array(
+        'name' => $mform_id . '{{ filters_par_name }}_fits_url'
+      ),
+      '#parent_classes' => array(
+        'euclid-instruments-filters fits-file-container'
+      ),
+    );
+
+    $form['{{ filters_par_name }}_fits'] = array(
+      '#type' => 'container',
+      '#title' => t('Filters from fits file'),
+      '#states' => array(
+          'visible' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'file')
+                )
+            ),
+            'enabled' => array(
+                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+                  array('value' => 'file')
+                )
+            )
+      ),
+      '#attributes' => array(
+        'class' => array(
+          'euclid-instruments-filters multivalued-field'
+        )
+      ),
+      '#suffix' => '<hr><label class="control-label">Filters</label>'
+    );
+
+    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
+      '#type' => 'select',
+      '#title' => t('Filter'),
+      '#required' => TRUE,
+      '#options' => $instruments_filters,
+      '#parent_classes' => array(
+        'col-md-4'
+      ),
+      '#prefix' => '<label class="control-label">List of filters loaded from the fits file</label>' . '<div class="row form-group multivalued-value">'
+    );
+    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
+      '#type' => 'select',
+      '#title' => t('Flux column name'),
+      '#required' => TRUE,
+      '#options' => array(),
+      '#parent_classes' => array(
+        'col-md-3 '
+      )
+    );
+    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
+      '#type' => 'select',
+      '#title' => t('Flux error column name'),
+      '#required' => TRUE,
+      '#options' => array(),
+      '#parent_classes' => array(
+        'col-md-3'
+      ),
+      '#suffix' => '</div>'
+    );
 
 
+{# for the user input filters #}
 
 $form['{{ filters_par_name }}'] = array(
   '#type' => 'container',
@@ -138,7 +208,7 @@ $form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
   '#parent_classes' => array(
     'col-md-4'
   ),
-  '#prefix' => '<label class="control-label">List of filters</label>' . '<div class="row form-group multivalued-value">'
+  '#prefix' => '<div class="row form-group multivalued-value">'
 );
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
   '#type' => 'textfield',

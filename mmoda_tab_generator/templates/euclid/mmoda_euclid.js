@@ -10,7 +10,7 @@
         }).then((buffer) => readFile(buffer));
     }
 
-    function readFile(arrayBuffer) {
+    function readFile(arrayBuffer, id_selector) {
         //FITS file object containing the file headers and data units
         //Library entry point expects a FITS file array buffer
 	    let fits_file = window.FITSReader.parseFITS(arrayBuffer);
@@ -35,17 +35,19 @@
 //	    data.getColumn(col_name, function(col){col_data = col});
 
         let select_filter_flux = document.getElementById(id_selector.replace("file", "flux-"));
-        select_filter_flux.innerHTML = data.columns.map(option => `<option value="${option}">${option}</option>`).join('');
+        select_filter_flux.innerHTML = [{value: '', text: '- Select -'}].concat(data.columns.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
         let select_filter_flux_error = document.getElementById(id_selector.replace("file", "flux-error-"));
-        select_filter_flux_error.innerHTML = data.columns.map(option => `<option value="${option}">${option}</option>`).join('');
+        select_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(data.columns.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
     }
 
     function commonReady() {
         let file_input = document.querySelectorAll('.euclid-instruments-filters.fits-file-container input');
         file_input[0].addEventListener('change', function(event) {
             let file = event.target.files[0];
+            let id_selector = event.target.id;
+            let name_selector = event.target.name;
             file.arrayBuffer().then(arrayBuffer => {
-                readFile(arrayBuffer);
+                readFile(arrayBuffer, id_selector);
             }).catch(error => {
                 console.error('Error reading file as ArrayBuffer:', error);
             });
