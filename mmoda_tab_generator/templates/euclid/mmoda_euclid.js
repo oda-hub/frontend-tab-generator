@@ -34,10 +34,35 @@
 //	    let col_data;
 //	    data.getColumn(col_name, function(col){col_data = col});
 
+        col_order = guess_columns(data.columns, ['z', 'z', 'z', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'], true);
+
         let select_filter_flux = document.getElementById(id_selector.replace("file", "flux-"));
         select_filter_flux.innerHTML = [{value: '', text: '- Select -'}].concat(data.columns.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
         let select_filter_flux_error = document.getElementById(id_selector.replace("file", "flux-error-"));
         select_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(data.columns.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
+    }
+
+    function guess_columns(cols, keys=[], empty=false) {
+        let col_order = structuredClone(cols);
+        for (let k of keys) {
+            let idx = Array.from({length: col_order.length}, (_, i) => i);
+            idx_found = [];
+            for (c of col_order){
+                if(c.toLowerCase().indexOf(k) !== -1)
+                    idx_found.push(col_order.indexOf(c));
+            }
+            idx = idx.filter((_, i) => !idx_found.includes(i));
+            idx = idx_found.concat(idx);
+            col_order = idx.map(i => col_order[i]);
+        }
+
+        if(col_order.length != cols.length){
+            console.error("Error: miss columns");
+        }
+        if (empty)
+            col_order.unshift('');
+
+        return col_order;
     }
 
     function commonReady() {
