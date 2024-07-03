@@ -2,8 +2,14 @@
     $(document).ready(commonReady);
 
     // flux and mag
-    var str_flux = ['mag', 'fl', 'flux']
-    var str_err = ['e', 'mag', 'em', 'emag', 'ef', 'efl', 'err', 'error', 'e_', '_e']
+    var str_flux = ['mag', 'fl', 'flux'];
+    var str_err = ['e', 'mag', 'em', 'emag', 'ef', 'efl', 'err', 'error', 'e_', '_e'];
+    // keys for the column params
+    var keys_MW_EBV = ['e', 'e_', 'b', 'v', 'mw', 'gal', 'b_', 'ebv', 'b-v'];
+    var keys_RA = ['coo', 'ra', 'rig', 'asc'];
+    var keys_DEC = ['coo', 'de', 'dec', 'decl'];
+    var keys_NZ_Prior_I = ['i', 'mag', 'f', 'fl', 'flux', '_i', 'i_', '.i', 'i.'];
+    var keys_Ztrue = ['z', '_z', 'z_', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'];
 
     function getFile(file_path) {
         return fetch(file_path)
@@ -22,13 +28,11 @@
 
         //Position of the header and data unit
         let hdu_index = 1;
-
 	    let hdu = fits_file.getHDU(hdu_index);
-
-	    let header = hdu.header;
 	    let data = hdu.data;
 
-        let card_name = "CARDNAME";
+	    // let header = hdu.header;
+        // let card_name = "CARDNAME";
 
 //	    //Get a specific card value
 //	    let card_value = header.get(card_name);
@@ -39,34 +43,6 @@
 //	    let col_data;
 //	    data.getColumn(col_name, function(col){col_data = col});
 
-
-        // let keys = ['f', 'r', 'flux', '_r', 'hsc'];
-        // let col_order = structuredClone(data.columns);
-        // for (let k of keys) {
-        //     let idx = Array.from({length: col_order.length}, (_, i) => i);
-        //     idx_found = [];
-        //     for (c of col_order){
-        //         if(c.toLowerCase().indexOf(k) !== -1)
-        //             idx_found.push(col_order.indexOf(c));
-        //     }
-        //     idx = idx.filter((_, i) => !idx_found.includes(i));
-        //     idx = idx_found.concat(idx);
-        //     col_order = idx.map(i => col_order[i]);
-        // }
-
-        // if(col_order.length != data.columns.length){
-        //     console.error("Error: miss columns");
-        // }
-
-        // col_order.unshift('');
-        // col_order = guess_columns(data.columns, ['z', 'z', 'z', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'], true);
-
-        // select_filter_flux.innerHTML = [{value: '', text: '- Select -'}].concat(col_order.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
-
-
-        // select_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(col_order.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
-
-        // let column_name_Nz_prior_I_input = document.querySelectorAll('.form-item-column-name-Nz-prior-I select');
         let selector_container = document.querySelectorAll('.euclid-instruments-filters.multivalued-field');
 
         selector_container[0].addEventListener('change', function(event) {
@@ -96,6 +72,24 @@
             selector_filter_flux.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_names_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
             selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_comun_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
         });
+
+        updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
+        updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
+        updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
+        updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
+        updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
+
+    }
+
+    function updateSelectorList(selectorName, keys, cols) {
+        let selector = document.querySelector(`[name="${selectorName}"]`);
+        if (selector !== null) {
+            let list_columns_names = guess_columns(cols, keys, true);
+            selector.innerHTML = [{value: '', text: '- Select -'}]
+                .concat(list_columns_names.map(column => ({value: column, text: column})))
+                .map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`)
+                .join('');
+        }
     }
 
     function guess_columns(cols, keys=[], empty=false) {
