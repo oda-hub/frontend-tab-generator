@@ -30,7 +30,11 @@
 
   {% if 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}
     {% for element in ['type', 'url', 'file'] %}
+      {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+      $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ par_name }}_{{ element }}'] = array(
+      {% else %}
       $form['{{ par_name }}_{{ element }}'] = array(
+      {% endif %}
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
         '#title' => t({% if element == 'type' %}'{{ par_name }}'{% elif element == 'url' %}'File URL'{% else %}'Upload a file'{% endif %},),
         {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
@@ -88,8 +92,10 @@
             'form-group',
             'col-md-8'
           ),
+          {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}
           '#prefix' => '<div class="row">',
           '#suffix' => '</div>'
+          {% endif %}
       );
     {% endfor %}
   {% else %}
