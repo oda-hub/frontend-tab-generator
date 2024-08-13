@@ -3,7 +3,7 @@
   {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata']
   and par_detail['extra_metadata']['group'] not in built_container_group_list %}
     {% set _ = built_container_group_list.append(par_detail['extra_metadata']['group']) %}
-    $form['{{ par_detail['extra_metadata']['group'] }}'] = array(
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}'] = array(
       '#type' => 'container',
       {% if 'products' in par_detail %}
         '#states' => array(
@@ -94,7 +94,7 @@
     {% endfor %}
   {% else %}
       {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-      $form['{{ par_detail['extra_metadata']['group'] }}']['{{ par_name }}'] = array(
+      $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ par_name }}'] = array(
       {% else %}
       $form['{{ par_name }}'] = array(
       {% endif %}

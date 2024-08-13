@@ -113,6 +113,10 @@ class MMODATabGenerator:
                 euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
         
         return is_euclid, euclid_table_parname, euclid_filters_list
+
+    @staticmethod
+    def snake_case(s):
+        return '_'.join(word.lower() for word in s.split())
     
     def generate(self, 
                  instrument_name, 
@@ -140,7 +144,8 @@ class MMODATabGenerator:
         
         is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
         
-        jenv = Environment(loader=PackageLoader('mmoda_tab_generator')) 
+        jenv = Environment(loader=PackageLoader('mmoda_tab_generator'))
+        jenv.filters['snake_case'] = self.snake_case
         
         if is_euclid:
             css_fname = "mmoda_euclid.css"
