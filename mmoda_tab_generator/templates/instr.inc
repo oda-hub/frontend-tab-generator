@@ -192,10 +192,11 @@
         '#label_classes' => array(
           'control-label'
         ),
-        {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}
-        '#prefix' => '<div class="row">',
-        '#suffix' => '</div>'
-        {% endif %}
+        '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
+                    {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
+
+          '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
+
       );
     {% endif %}
 {%- endmacro %}
