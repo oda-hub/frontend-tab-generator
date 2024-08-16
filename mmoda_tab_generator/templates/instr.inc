@@ -36,7 +36,13 @@
       $form['{{ par_name }}_{{ element }}'] = array(
       {% endif %}
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
-        '#title' => t({% if element == 'type' %}'{{ par_name }}'{% elif element == 'url' %}'File URL'{% else %}'Upload a file'{% endif %},),
+        {% if element == 'type' %}
+        '#title' =>  {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}{{ par_name }}"{% endif %},
+        {% elif element == 'url' %}
+        '#title' => t('File URL'),
+        {% else %}
+        '#title' => t('Upload a file'),
+        {% endif %}
         {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
         '#default_value' => t($instrument_defaults['{{ par_name }}']),
         {% endif %}
@@ -92,10 +98,12 @@
             'form-group',
             'col-md-8'
           ),
-          {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}
-          '#prefix' => '<div class="row">',
-          '#suffix' => '</div>'
-          {% endif %}
+
+          '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
+                    {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
+
+          '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
+
       );
     {% endfor %}
   {% else %}
@@ -125,7 +133,8 @@
         '#type' => 'textfield',
         {% endif %}
         {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}
-        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' . {% endif %}t("{{ par_detail['extra_metadata']['label'] }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
+        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' .
+                    {% endif %}t("{{ par_detail['extra_metadata']['label'] }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
         {% else %}
         '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' . {% endif %}t("{{ par_name }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
         {% endif %}
