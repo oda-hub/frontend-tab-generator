@@ -31,18 +31,6 @@
 	    let hdu = fits_file.getHDU(hdu_index);
 	    let data = hdu.data;
 
-	    // let header = hdu.header;
-        // let card_name = "CARDNAME";
-
-//	    //Get a specific card value
-//	    let card_value = header.get(card_name);
-//
-//	    let col_name = "column";
-//
-//	    //Specific to BINTABLE and TABLE extension
-//	    let col_data;
-//	    data.getColumn(col_name, function(col){col_data = col});
-
         let selector_container = document.querySelectorAll('.euclid-instruments-filters.multivalued-field');
 
         selector_container[0].addEventListener('change', function(event) {
@@ -51,7 +39,6 @@
             let divBlock = selector_filter.closest('div.row.form-group.multivalued-value');
             let selector_filter_flux = divBlock.querySelector('[id$="flux-"]');
             let selector_filter_flux_error = divBlock.querySelector('[id$="flux-error-"]');
-            console.log("selected: " + selected_filter);
 
             f0 = selected_filter.split('|')[0]
             f1 = selected_filter.split('|')[1]
