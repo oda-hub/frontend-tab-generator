@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import shutil
 
 import requests
 import json
@@ -9,6 +10,7 @@ from mmoda_tab_generator import Config
 import time
 import jwt
 import logging
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -111,6 +113,10 @@ class MMODATabGenerator:
                 euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
         
         return is_euclid, euclid_table_parname, euclid_filters_list
+
+    @staticmethod
+    def snake_case(s):
+        return '_'.join(word.lower() for word in s.split())
     
     def generate(self, 
                  instrument_name, 
@@ -129,6 +135,8 @@ class MMODATabGenerator:
         
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
         os.makedirs(this_instr_path, exist_ok=True)
+        this_instr_js_path = os.path.join(this_instr_path, "js")
+        os.makedirs(this_instr_js_path, exist_ok=True)
         basename = os.path.join(this_instr_path, f"mmoda_{frontend_name}")
 
         css_fname = None
@@ -136,14 +144,34 @@ class MMODATabGenerator:
         
         is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
         
-        jenv = Environment(loader=PackageLoader('mmoda_tab_generator')) 
+        jenv = Environment(loader=PackageLoader('mmoda_tab_generator'))
+        jenv.filters['snake_case'] = self.snake_case
         
         if is_euclid:
             css_fname = "mmoda_euclid.css"
             templ = jenv.get_template('euclid/mmoda_euclid.css')
             with open(os.path.join(this_instr_path, css_fname), 'w') as fd:
                 fd.write(templ.render())
-                
+
+            js_fname = "mmoda_euclid.js"
+            templ = jenv.get_template('euclid/mmoda_euclid.js')
+            with open(os.path.join(this_instr_js_path, js_fname), 'w') as fd:
+                fd.write(templ.render())
+
+            # TODO initially here during development
+            astrojsvis_repo_url = "git@github.com:esg-epfl-apc/astrojsvis.git"
+            fits_reader_repo_url = "git@github.com:esg-epfl-apc/fits-reader.git"
+            # astrojsvis_lib_path = os.path.join(this_instr_js_path, "astrojsvis")
+            # if os.path.exists(astrojsvis_lib_path):
+            #     shutil.rmtree(astrojsvis_lib_path)
+            fits_reader_lib_path = os.path.join(this_instr_js_path, "fits-reader")
+            if os.path.exists(fits_reader_lib_path):
+                shutil.rmtree(fits_reader_lib_path)
+
+            # subprocess.check_output(["git", "clone", "-b", "jsvis-prototype", "--single-branch",
+            #                          astrojsvis_repo_url, astrojsvis_lib_path])
+            subprocess.check_output(["git", "clone", fits_reader_repo_url, fits_reader_lib_path])
+
             with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
                 fd.write('Instrument,Filter\n')
                 for flt in euclid_filters_list:

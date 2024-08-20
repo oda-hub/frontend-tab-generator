@@ -1,10 +1,48 @@
 {% from 'euclid/macros.j2' import euclid_form_field %}
-{% macro formfield(par_name, par_detail) -%}
+{% macro formfield(par_name, par_detail, built_container_group_list) -%}
+  {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata']
+  and par_detail['extra_metadata']['group'] not in built_container_group_list %}
+    {% set _ = built_container_group_list.append(par_detail['extra_metadata']['group']) %}
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}'] = array(
+      '#type' => 'container',
+      {% if 'products' in par_detail %}
+        '#states' => array(
+          {% set ns = namespace(prod_sets = []) %}
+          {% for x in par_detail.products %}
+          {% set ns.prod_sets = ns.prod_sets + ["array('value' => '%s')" % x] %}
+          {% endfor %}
+          'visible' => array(
+            ':input[name="' . $mform_id . 'product_type"]' => array(
+              {{ ", 'or', ".join(ns.prod_sets) }}
+            ),
+          ),
+          'enabled' => array(
+            ':input[name="' . $mform_id . 'product_type"]' => array(
+              {{ ", 'or', ".join(ns.prod_sets) }}
+            ),
+          )
+        ),
+    {% endif %}
+    '#prefix' => '<hr><label class="control-label">{{ par_detail['extra_metadata']['group'] }}</label><div class="row multivalued-value">',
+    '#suffix' => '</div><hr>'
+    );
+  {% endif %}
+
   {% if 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}
     {% for element in ['type', 'url', 'file'] %}
+      {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+      $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ par_name }}_{{ element }}'] = array(
+      {% else %}
       $form['{{ par_name }}_{{ element }}'] = array(
+      {% endif %}
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
-        '#title' => t({% if element == 'type' %}'{{ par_name }}'{% elif element == 'url' %}'File URL'{% else %}'Upload a file'{% endif %},),
+        {% if element == 'type' %}
+        '#title' =>  {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}{{ par_name }}"{% endif %},
+        {% elif element == 'url' %}
+        '#title' => t('File URL'),
+        {% else %}
+        '#title' => t('Upload a file'),
+        {% endif %}
         {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
         '#default_value' => t($instrument_defaults['{{ par_name }}']),
         {% endif %}
@@ -60,12 +98,20 @@
             'form-group',
             'col-md-8'
           ),
-          '#prefix' => '<div class="row">',
-          '#suffix' => '</div>'
+
+          '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
+                    {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
+
+          '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
+
       );
     {% endfor %}
   {% else %}
+      {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+      $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ par_name }}'] = array(
+      {% else %}
       $form['{{ par_name }}'] = array(
+      {% endif %}
         {% if par_detail['value'].__class__.__name__ == 'bool' %}
         '#type' => 'radios',
         '#options' => array(
@@ -86,7 +132,12 @@
         {% else %}
         '#type' => 'textfield',
         {% endif %}
-        '#title' => t("{{ par_name }}"),
+        {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}
+        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' .
+                    {% endif %}t("{{ par_detail['extra_metadata']['label'] }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
+        {% else %}
+        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' . {% endif %}t("{{ par_name }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
+        {% endif %}
         '#default_value' => $instrument_defaults['{{ par_name }}'],
         {% if par_detail.units and par_detail.units != 'str' %}
         '#field_suffix' => t("{{ par_detail.units }}"),
@@ -111,42 +162,41 @@
         {% endif %}
         '#attributes' => array(
           'name' => $mform_id . '{{ par_name }}',
-
           {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}
               'maxlength' => '10000',
               'class' => array(
                   'form-control'
               )
           {% endif %}
-
           {% if 'restrictions' in par_detail %}
               {% if par_detail['restrictions']['min_value'] is defined and par_detail['restrictions']['max_value'] is defined %}
               'data-bv-between-max' => '{{ par_detail['restrictions']['max_value'] }}',
               'data-bv-between-min' => '{{ par_detail['restrictions']['min_value'] }}',
               'data-bv-between' => 'true',
-
               {% elif par_detail['restrictions']['min_value'] is defined %}
               'data-bv-greaterthan-value' => '{{ par_detail['restrictions']['min_value'] }}',
               'data-bv-greaterthan' => 'true',
-
               {% elif par_detail['restrictions']['max_value'] is defined %}
               'data-bv-lessthan-value' => '{{ par_detail['restrictions']['max_value'] }}',
               'data-bv-lessthan' => 'true',
-
               {% endif %}
           {% endif %}
         ),
         '#parent_classes' => array(
           'form-group',
           {% if 'http://odahub.io/ontology#LongString' in par_detail['owl_uri'] %}'col-md-12'
-          {% elif 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}'col-md-8'{% else %}
+          {% elif 'http://odahub.io/ontology#FileReference' in par_detail['owl_uri'] %}'col-md-8'
+          {% elif 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}'col-md-4'{% else %}
           'col-md-6'{% endif %}
         ),
         '#label_classes' => array(
           'control-label'
         ),
-        '#prefix' => '<div class="row">',
-        '#suffix' => '</div>'
+        '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
+                    {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
+
+          '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
+
       );
     {% endif %}
 {%- endmacro %}
@@ -189,9 +239,9 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
     '#type' => 'hidden',
     '#value' => $instrument_defaults['query_type'],
   );
-
+  {% set built_container_group_list = [] %}
   {% for par_name, par_detail in param_dict.items() if par_detail['in_instr_query'] %}
-    {{ formfield(par_name, par_detail) }}
+    {{ formfield(par_name, par_detail, built_container_group_list) }}
   {% endfor %}
 
   $form['product_type'] = array(
@@ -220,9 +270,9 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
 
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
     {% if euclid_table_parname is not none and par_name == euclid_table_parname %}
-      {{ euclid_form_field(par_name) }}
+{{ euclid_form_field(par_name) }}
     {% else %}
-      {{ formfield(par_name, par_detail) }}
+{{ formfield(par_name, par_detail, built_container_group_list) }}
     {% endif %}
   {% endfor %}
 
