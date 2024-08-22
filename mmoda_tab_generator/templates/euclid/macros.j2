@@ -52,7 +52,7 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 
 
 {# TODO: prefix-suffix, visibility etc #}
-{% macro euclid_form_field(filters_par_name) -%}
+{% macro euclid_form_field(filters_par_name, par_detail) -%}
 
 drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/fits-reader/dist/fits-reader/fits-reader.js');
 drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/mmoda_euclid.js');
@@ -68,7 +68,7 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
 
     $form['{{ filters_par_name }}_fits_type'] = array(
         '#type' => 'radios',
-        '#title' => t('{{ filters_par_name }} fits file'),
+        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}t('{{ filters_par_name }} fits file'){% endif %},
         '#options' => array(
             'file' => t('Upload a file'),
             'url' => t('Provide a URL')
@@ -139,12 +139,12 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
       '#states' => array(
           'visible' => array(
                 ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'file')
+                  array('value' => 'file'), 'or', array('value' => 'url')
                 )
             ),
             'enabled' => array(
                 ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'file')
+                  array('value' => 'url'), 'or', array('value' => 'file')
                 )
             )
       ),
