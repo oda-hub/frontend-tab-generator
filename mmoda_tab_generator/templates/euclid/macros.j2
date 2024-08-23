@@ -111,7 +111,7 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
 
     $form['{{ filters_par_name }}_fits_url'] = array(
       '#type' => 'textfield',
-      '#title' => t('Fits file URL',),
+      '#title' => t('Fits file URL',) . '<span class="reload-fits-file-button glyphicon glyphicon-refresh"></span>' ,
       '#description' => t('Provide the url of the fits file'),
       '#states' => array(
           'visible' => array(
