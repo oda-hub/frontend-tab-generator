@@ -162,7 +162,8 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
       '#required' => TRUE,
       '#options' => $instruments_filters,
       '#parent_classes' => array(
-        'col-md-4'
+        'col-md-4',
+        'instrument-filters'
       ),
       '#prefix' => '<label class="control-label">List of filters loaded from the fits file</label>' . '<div class="row form-group multivalued-value">'
     );
@@ -186,8 +187,8 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
       '#suffix' => '</div>'
     );
 
-drupal_add_js(array(
-    'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
-  ), 'setting');
+    drupal_add_js(array(
+        'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
+      ), 'setting');
 
 {%- endmacro -%}

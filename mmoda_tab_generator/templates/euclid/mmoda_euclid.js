@@ -31,7 +31,7 @@
 	    let hdu = fits_file.getHDU(hdu_index);
 	    let data = hdu.data;
 
-        let selector_container = document.querySelectorAll('.euclid-instruments-filters.multivalued-field');
+        let selector_container = document.querySelectorAll('.euclid-instruments-filters .multivalued-value .instrument-filters');
 
         selector_container[0].addEventListener('change', function(event) {
             let selector_filter = event.target;
