@@ -186,48 +186,6 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
       '#suffix' => '</div>'
     );
 
-
-{# for the user input filters #}
-{#
-$form['{{ filters_par_name }}'] = array(
-  '#type' => 'container',
-  '#title' => t('Filters'),
-  '#attributes' => array(
-    'class' => array(
-      'euclid-instruments-filters multivalued-field'
-    )
-  ),
-  '#suffix' => '<hr><label class="control-label">Filters</label>'
-);
-
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
-  '#type' => 'select',
-  '#title' => t('Filter'),
-  '#required' => TRUE,
-  '#options' => $instruments_filters,
-  '#parent_classes' => array(
-    'col-md-4'
-  ),
-  '#prefix' => '<div class="row form-group multivalued-value">'
-);
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
-  '#type' => 'textfield',
-  '#title' => t('Flux column name'),
-  '#required' => TRUE,
-  '#parent_classes' => array(
-    'col-md-3 '
-  )
-);
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
-  '#type' => 'textfield',
-  '#title' => t('Flux error column name'),
-  '#required' => TRUE,
-  '#parent_classes' => array(
-    'col-md-3'
-  ),
-  '#suffix' => '</div>'
-);
-#}
 drupal_add_js(array(
     'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
   ), 'setting');
