@@ -71,10 +71,16 @@
     }
 
     function updateSelectorList(selectorName, keys, cols) {
-        let selector = document.querySelector(`[name="${selectorName}"]`);
-        if (selector !== null) {
+        let input_selector = document.querySelector(`[name="${selectorName}"]`);
+        if (input_selector !== null) {
+            let select_selector = $('<select class="form-control from-select"></select>');
+            $.each(input_selector.attributes, function(index, attribute) {
+                if (attribute.name === 'name' || attribute.name === 'id')
+                    select_selector.attr(attribute.name, attribute.value);
+            });
+            input_selector.replaceWith(select_selector[0]);
             let list_columns_names = guess_columns(cols, keys, true);
-            selector.innerHTML = []
+            select_selector[0].innerHTML = []
                 .concat(list_columns_names.map(column => ({value: column, text: column})))
                 .map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`)
                 .join('');
