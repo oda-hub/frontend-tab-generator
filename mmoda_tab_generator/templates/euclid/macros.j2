@@ -65,7 +65,7 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
     $instruments_filters[$instrument][$instrument . '|' . $filter] = $filter;
   }
 }
-
+{#
     $form['{{ filters_par_name }}_fits_type'] = array(
         '#type' => 'radios',
         '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}t('{{ filters_par_name }} fits file'){% endif %},
@@ -132,8 +132,12 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
         'euclid-instruments-filters fits-file-container'
       ),
     );
-
+#}
+    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits'] = array(
+    {% else %}
     $form['{{ filters_par_name }}_fits'] = array(
+    {% endif %}
       '#type' => 'container',
       '#title' => t('Filters from fits file'),
       '#states' => array(
@@ -150,13 +154,19 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
       ),
       '#attributes' => array(
         'class' => array(
-          'euclid-instruments-filters multivalued-field'
+          'euclid-instruments-filters',
+           'multivalued-field',
+           'col-md-12'
         )
       ),
-      '#suffix' => '<hr>'
+      '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr>'{% else %}''{% endif %}
     );
 
+    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
+    {% else %}
     $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
+    {% endif %}
       '#type' => 'select',
       '#title' => t('Filter'),
       '#required' => TRUE,
@@ -165,9 +175,14 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
         'col-md-4',
         'instrument-filters'
       ),
-      '#prefix' => '<label class="control-label">List of filters loaded from the fits file</label>' . '<div class="row form-group multivalued-value">'
+      # TODO not clear why, but by removing the label tag, the labels of the filters drop-down menus disappear
+      '#prefix' => '<label class="control-label"></label>' . '<div class="row form-group multivalued-value">'
     );
+    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
+    {% else %}
     $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
+    {% endif %}
       '#type' => 'select',
       '#title' => t('Flux column name'),
       '#required' => TRUE,
@@ -176,7 +191,11 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
         'col-md-3 '
       )
     );
+    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
+    {% else %}
     $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
+    {% endif %}
       '#type' => 'select',
       '#title' => t('Flux error column name'),
       '#required' => TRUE,
