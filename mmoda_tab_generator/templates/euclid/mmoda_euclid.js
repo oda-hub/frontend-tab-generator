@@ -82,7 +82,7 @@
             let list_columns_names = guess_columns(cols, keys, true);
             select_selector[0].innerHTML = []
                 .concat(list_columns_names.map(column => ({value: column, text: column})))
-                .map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`)
+                .map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`)
                 .join('');
         }
     }
