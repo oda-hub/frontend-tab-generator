@@ -111,16 +111,22 @@
     }
 
     function commonReady() {
-        let file_input = document.querySelectorAll('.euclid-instruments-filters.fits-file-container input');
-        file_input[0].addEventListener('change', function(event) {
-            let file = event.target.files[0];
-            let id_selector = event.target.id;
-            let name_selector = event.target.name;
-            file.arrayBuffer().then(arrayBuffer => {
-                readFile(arrayBuffer, id_selector);
-            }).catch(error => {
-                console.error('Error reading file as ArrayBuffer:', error);
-            });
-        });
+        let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
+        if(instrument_filters_selector.length > 0)
+            var id_container = instrument_filters_selector[0].parentElement.id;
+        if(typeof(id_container) !== 'undefined') {
+            let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
+            if(file_input.length > 0)
+                file_input[0].addEventListener('change', function(event) {
+                    let file = event.target.files[0];
+                    let id_selector = event.target.id;
+                    let name_selector = event.target.name;
+                    file.arrayBuffer().then(arrayBuffer => {
+                        readFile(arrayBuffer, id_selector);
+                    }).catch(error => {
+                        console.error('Error reading file as ArrayBuffer:', error);
+                    });
+                });
+        }
     }
 })(jQuery);
