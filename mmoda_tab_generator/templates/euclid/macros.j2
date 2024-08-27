@@ -65,149 +65,82 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
     $instruments_filters[$instrument][$instrument . '|' . $filter] = $filter;
   }
 }
-{#
-    $form['{{ filters_par_name }}_fits_type'] = array(
-        '#type' => 'radios',
-        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}t('{{ filters_par_name }} fits file'){% endif %},
-        '#options' => array(
-            'file' => t('Upload a file'),
-            'url' => t('Provide a URL')
-        ),
-        '#default_value' => 'file',
-        '#parent_classes' => array(
-          'form-group',
-          'col-md-8'
-        ),
-        '#attributes' => array(
-          'name' => $mform_id . '{{ filters_par_name }}_fits_type',
-        ),
-        '#prefix' => '<div class="row">',
-        '#suffix' => '</div>'
-    );
 
-    $form['{{ filters_par_name }}_fits_file'] = array(
-      '#type' => 'file',
-      '#title' => t('Upload a fits file',),
-      '#description' => t('Upload a fits file'),
-      '#states' => array(
-          'visible' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'file')
-                )
-            ),
-            'enabled' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'file')
-                )
+{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits'] = array(
+{% else %}
+$form['{{ filters_par_name }}_fits'] = array(
+{% endif %}
+  '#type' => 'container',
+  '#title' => t('Filters from fits file'),
+  '#states' => array(
+      'visible' => array(
+            ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+              array('value' => 'file'), 'or', array('value' => 'url')
             )
-      ),
-      '#attributes' => array(
-        'name' => $mform_id . '{{ filters_par_name }}_fits_file'
-      ),
-      '#parent_classes' => array(
-        'euclid-instruments-filters fits-file-container'
-      ),
-    );
-
-    $form['{{ filters_par_name }}_fits_url'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Fits file URL',) . '<span class="reload-fits-file-button glyphicon glyphicon-refresh"></span>' ,
-      '#description' => t('Provide the url of the fits file'),
-      '#states' => array(
-          'visible' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'url')
-                )
-            ),
-            'enabled' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'url')
-                )
+        ),
+        'enabled' => array(
+            ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
+              array('value' => 'url'), 'or', array('value' => 'file')
             )
-      ),
-      '#attributes' => array(
-        'name' => $mform_id . '{{ filters_par_name }}_fits_url'
-      ),
-      '#parent_classes' => array(
-        'euclid-instruments-filters fits-file-container'
-      ),
-    );
-#}
-    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits'] = array(
-    {% else %}
-    $form['{{ filters_par_name }}_fits'] = array(
-    {% endif %}
-      '#type' => 'container',
-      '#title' => t('Filters from fits file'),
-      '#states' => array(
-          'visible' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'file'), 'or', array('value' => 'url')
-                )
-            ),
-            'enabled' => array(
-                ':input[name="' . $mform_id . '{{ filters_par_name }}_fits_type"]' => array(
-                  array('value' => 'url'), 'or', array('value' => 'file')
-                )
-            )
-      ),
-      '#attributes' => array(
-        'class' => array(
-          'euclid-instruments-filters',
-           'multivalued-field',
-           'col-md-12'
         )
-      ),
-      '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr>'{% else %}''{% endif %}
-    );
+  ),
+  '#attributes' => array(
+    'class' => array(
+      'euclid-instruments-filters',
+       'multivalued-field',
+       'col-md-12'
+    )
+  ),
+  '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr>'{% else %}''{% endif %}
+);
 
-    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
-    {% else %}
-    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
-    {% endif %}
-      '#type' => 'select',
-      '#title' => t('Filter'),
-      '#required' => TRUE,
-      '#options' => $instruments_filters,
-      '#parent_classes' => array(
-        'col-md-4',
-        'instrument-filters'
-      ),
-      # TODO not clear why, but by removing the label tag, the labels of the filters drop-down menus disappear
-      '#prefix' => '<label class="control-label"></label>' . '<div class="row form-group multivalued-value">'
-    );
-    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
-    {% else %}
-    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
-    {% endif %}
-      '#type' => 'select',
-      '#title' => t('Flux column name'),
-      '#required' => TRUE,
-      '#options' => array(),
-      '#parent_classes' => array(
-        'col-md-3 '
-      )
-    );
-    {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-    $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
-    {% else %}
-    $form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
-    {% endif %}
-      '#type' => 'select',
-      '#title' => t('Flux error column name'),
-      '#required' => TRUE,
-      '#options' => array(),
-      '#parent_classes' => array(
-        'col-md-3'
-      ),
-      '#suffix' => '</div>'
-    );
+{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
+{% else %}
+$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[filter][]'] = array(
+{% endif %}
+  '#type' => 'select',
+  '#title' => t('Filter'),
+  '#required' => TRUE,
+  '#options' => $instruments_filters,
+  '#parent_classes' => array(
+    'col-md-4',
+    'instrument-filters'
+  ),
+  # TODO not clear why, but by removing the label tag, the labels of the filters drop-down menus disappear
+  '#prefix' => '<label></label>' .'<div class="row form-group multivalued-value">'
+);
+{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
+{% else %}
+$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux][]'] = array(
+{% endif %}
+  '#type' => 'select',
+  '#title' => t('Flux column name'),
+  '#required' => TRUE,
+  '#options' => array(),
+  '#parent_classes' => array(
+    'col-md-3 '
+  )
+);
+{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
+{% else %}
+$form['{{ filters_par_name }}_fits']['{{ filters_par_name }}_fits[flux_error][]'] = array(
+{% endif %}
+  '#type' => 'select',
+  '#title' => t('Flux error column name'),
+  '#required' => TRUE,
+  '#options' => array(),
+  '#parent_classes' => array(
+    'col-md-3'
+  ),
+  '#suffix' => '</div>'
+);
 
-    drupal_add_js(array(
-        'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
-      ), 'setting');
+drupal_add_js(array(
+    'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
+  ), 'setting');
 
 {%- endmacro -%}
