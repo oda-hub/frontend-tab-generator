@@ -11,9 +11,13 @@
     var keys_NZ_Prior_I = ['i', 'mag', 'f', 'fl', 'flux', '_i', 'i_', '.i', 'i.'];
     var keys_Ztrue = ['z', '_z', 'z_', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'];
 
-    function getFile(file_path) {
+    function getFile(file_path, clicked_component=null) {
         return fetch(file_path)
             .then((response) => {
+                if (clicked_component !== null) {
+                    clicked_component.siblings('i').hide();
+                    clicked_component.show();
+                }
                 if (!response.ok) {
                     throw new Error(`HTTP error, status = ${response.status}`);
                 }
@@ -21,6 +25,10 @@
             })
             .then((buffer) => readFile(buffer))
             .catch((error) => {
+                if (clicked_component !== null) {
+                    clicked_component.siblings('i').hide();
+                    clicked_component.show();
+                }
                 console.error('Error fetching or reading file:', error);
             });
     }
@@ -121,7 +129,9 @@
         if(typeof(id_container) !== 'undefined') {
             let file_url_textfield = $(`#${id_container} .form-type-textfield`);
             if(file_url_textfield.length > 0) {
-                let reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL').append($('<span>').addClass('glyphicon glyphicon-refresh'));
+                let reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
+                                        .append($('<span>').addClass('glyphicon glyphicon-refresh'))
+                                        .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
                 reload_fits_button.on('click', reload_fits_button_click);
                 let file_url_textfield_input = file_url_textfield.children('input');
                 let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
@@ -143,7 +153,9 @@
     }
 
     function reload_fits_button_click(event) {
+        $(event.target).hide();
+        $(event.target).siblings('i').show();
         let fits_url = $(event.target).siblings('input').val();
-        getFile(fits_url);
+        getFile(fits_url, $(event.target));
     }
 })(jQuery);
