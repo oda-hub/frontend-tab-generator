@@ -96,7 +96,7 @@
           {% endif %}
           '#parent_classes' => array(
             'form-group',
-            'col-md-8'
+            'col-md-10'
           ),
 
           '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}

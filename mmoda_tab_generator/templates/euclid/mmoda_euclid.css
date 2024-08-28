@@ -18,6 +18,11 @@
   margin-bottom: 15px !important;
 }
 
-.reload-fits-file-button {
-  margin-left: 0.75em;
+.fits-url-container {
+  display: flex;
+}
+
+.button-refresh-url {
+  margin-left: 1em;
+  float: right !important;
 }

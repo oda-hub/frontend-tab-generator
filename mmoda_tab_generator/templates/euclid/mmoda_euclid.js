@@ -115,12 +115,19 @@
         if(instrument_filters_selector.length > 0)
             var id_container = instrument_filters_selector[0].parentElement.id;
         if(typeof(id_container) !== 'undefined') {
+            var reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').append($('<span>').addClass('glyphicon glyphicon-refresh'));
+            let file_url_textfield = $(`#${id_container} .form-type-textfield`);
+            if(file_url_textfield.length > 0) {
+                let file_url_textfield_input = file_url_textfield.children('input');
+                let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
+                file_url_textfield.append(container_textfield_and_button[0]);
+            }
             let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
+
             if(file_input.length > 0)
                 file_input[0].addEventListener('change', function(event) {
                     let file = event.target.files[0];
                     let id_selector = event.target.id;
-                    let name_selector = event.target.name;
                     file.arrayBuffer().then(arrayBuffer => {
                         readFile(arrayBuffer, id_selector);
                     }).catch(error => {
