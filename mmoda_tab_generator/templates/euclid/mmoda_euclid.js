@@ -18,7 +18,11 @@
                     throw new Error(`HTTP error, status = ${response.status}`);
                 }
                 return response.arrayBuffer();
-        }).then((buffer) => readFile(buffer));
+            })
+            .then((buffer) => readFile(buffer))
+            .catch((error) => {
+                console.error('Error fetching or reading file:', error);
+            });
     }
 
     function readFile(arrayBuffer, id_selector) {
@@ -115,9 +119,10 @@
         if(instrument_filters_selector.length > 0)
             var id_container = instrument_filters_selector[0].parentElement.id;
         if(typeof(id_container) !== 'undefined') {
-            var reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').append($('<span>').addClass('glyphicon glyphicon-refresh'));
             let file_url_textfield = $(`#${id_container} .form-type-textfield`);
             if(file_url_textfield.length > 0) {
+                let reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL').append($('<span>').addClass('glyphicon glyphicon-refresh'));
+                reload_fits_button.on('click', reload_fits_button_click);
                 let file_url_textfield_input = file_url_textfield.children('input');
                 let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
                 file_url_textfield.append(container_textfield_and_button[0]);
@@ -135,5 +140,10 @@
                     });
                 });
         }
+    }
+
+    function reload_fits_button_click(event) {
+        let fits_url = $(event.target).siblings('input').val();
+        getFile(fits_url);
     }
 })(jQuery);
