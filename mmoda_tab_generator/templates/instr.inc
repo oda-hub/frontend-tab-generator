@@ -82,6 +82,9 @@
             {% else %}
             'name' => $mform_id . '{{ par_name }}_{{ element }}',
             {% endif %}
+            'class' => array(
+                'no-padding-right'
+            )
           ),
           {% if element == 'type' %}
           '#options' => array(
@@ -96,7 +99,7 @@
           {% endif %}
           '#parent_classes' => array(
             'form-group',
-            'col-md-10'
+            'col-md-11'
           ),
 
           '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
