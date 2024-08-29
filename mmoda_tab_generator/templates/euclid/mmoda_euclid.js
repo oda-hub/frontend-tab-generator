@@ -129,7 +129,7 @@
         if(typeof(id_container) !== 'undefined') {
             let file_url_textfield = $(`#${id_container} .form-type-textfield`);
             if(file_url_textfield.length > 0) {
-                let reload_fits_button = $('<button>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
+                let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
                                         .append($('<span>').addClass('glyphicon glyphicon-refresh'))
                                         .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
                 reload_fits_button.on('click', reload_fits_button_click);
