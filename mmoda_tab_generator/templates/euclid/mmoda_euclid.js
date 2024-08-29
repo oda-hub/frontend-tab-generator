@@ -19,7 +19,7 @@
                     clicked_component.show();
                 }
                 if (!response.ok) {
-                    throw new Error(`HTTP error, status = ${response.status}`);
+                    throw new Error(`Error during the loading of the fits file, status = ${response.status}`);
                 }
                 return response.arrayBuffer();
             })
@@ -152,10 +152,35 @@
         }
     }
 
-    function reload_fits_button_click(event) {
-        $(event.target).hide();
-        $(event.target).siblings('i').show();
-        let fits_url = $(event.target).siblings('input').val();
-        getFile(fits_url, $(event.target));
+    function AJAX_call_get_token() {
+        return $.ajax({
+          url: 'get_token',
+        });
     }
+
+    function reload_fits_button_click(event) {
+        let refresh_button = $('.button-refresh-url');
+        let refresh_button_spinner = $('.button-refresh-url span');
+        refresh_button_spinner.hide();
+        refresh_button_spinner.siblings('i').show();
+        let fits_file_url = refresh_button.siblings('input').val();
+
+        AJAX_call_get_token().done(
+            function(data, textStatus, jqXHR) {
+                if (data.hasOwnProperty('token') && data.token !== null && data.token !== undefined && data.token !== '') {
+                    let token = data.token;
+                    parameters = {"fits_file_url": fits_file_url, "token": token};
+                    let url_request = 'dispatch-data/load-frontend-fits-file-url?' + $.param(parameters);
+                    getFile(url_request, refresh_button_spinner);
+                }
+            }
+        ).error(function(jqXHR, textStatus, errorThrown) {
+            console.log('Error in requesting the user token:');
+            console.log('textStatus : ' + textStatus);
+            console.log('errorThrown :' + errorThrown);
+            console.log('jqXHR');
+            console.log(jqXHR);
+        });
+    }
+
 })(jQuery);
