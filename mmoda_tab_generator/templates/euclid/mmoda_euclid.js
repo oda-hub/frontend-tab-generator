@@ -11,6 +11,28 @@
     var keys_NZ_Prior_I = ['i', 'mag', 'f', 'fl', 'flux', '_i', 'i_', '.i', 'i.'];
     var keys_Ztrue = ['z', '_z', 'z_', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'];
 
+    function insert_new_multivalued_field(add_multivalued_button) {
+        var current_instrument_form_validator = $(add_multivalued_button).closest('.instrument-panel form').data('bootstrapValidator');
+        var multivalued_field = $(add_multivalued_button).closest('.multivalued-field');
+        var current_row = $(add_multivalued_button).prev();
+        var newVAlue = current_row.clone();
+        $('input, select, textarea', newVAlue).val('');
+        current_row.after(newVAlue);
+        $('button', multivalued_field).prop('disabled', false);
+        $('input, select, textarea', newVAlue).each(function() {
+          current_instrument_form_validator.addField($(this));
+        });
+        newVAlue.show();
+      }
+
+      function delete_multivalued_field(delete_multivalued_button) {
+        multivalued_field = $(delete_multivalued_button).closest('.multivalued-field');
+        var current_row = $(delete_multivalued_button).parent();
+        current_row.remove();
+        var nb_rows = $('.multivalued-value', multivalued_field).length;
+        if (nb_rows == 1) $('button.delete-multivalued-element', multivalued_field).prop('disabled', true)
+      }
+
     function getFile(file_path, clicked_component=null) {
         return fetch(file_path)
             .then((response) => {
@@ -123,6 +145,36 @@
     }
 
     function commonReady() {
+        // add plus and minus buttons for the filters
+        $('.multivalued-field').removeClass('form-group');
+
+        var add_multivalued_elt_button = $('<button>').addClass('btn btn-secondary add-multivalued-element').append($('<span>').addClass('glyphicon glyphicon-plus'));
+        var del_multivalued_elt_button = $('<button>').addClass('btn btn-secondary delete-multivalued-element').append($('<span>').addClass('glyphicon glyphicon-minus'));
+        $('.multivalued-field').append(add_multivalued_elt_button);
+        $('.multivalued-field .multivalued-value').append(del_multivalued_elt_button);
+        $('button', '.multivalued-field .multivalued-value').prop('disabled', true);
+
+        $('.multivalued-field .multivalued-value').each(function() {
+          var multivalued_field = $(this).closest('.multivalued-field');
+          var labels = $(this).clone();
+          labels.find('input, select, textarea, button').remove();
+          labels.removeClass('multivalued-value');
+          $(this).find('label').remove();
+          multivalued_field.find('label:first').after(labels);
+        })
+
+        $('.multivalued-field').on('click', '.add-multivalued-element', function(e) {
+          // Prevent form submission
+          e.preventDefault();
+          insert_new_multivalued_field(this);
+        });
+        $('.multivalued-field').on('click', '.delete-multivalued-element', function(e) {
+          // Prevent form submission
+          e.preventDefault();
+          delete_multivalued_field(this);
+        });
+
+        // add the reload button for the fits file
         let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
         if(instrument_filters_selector.length > 0)
             var id_container = instrument_filters_selector[0].parentElement.id;
