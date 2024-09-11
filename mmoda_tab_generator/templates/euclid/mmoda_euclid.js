@@ -171,7 +171,7 @@
                 if (data.hasOwnProperty('token') && data.token !== null && data.token !== undefined && data.token !== '') {
                     let token = data.token;
                     parameters = {"fits_file_url": fits_file_url, "token": token};
-                    let url_request = 'dispatch-data/load-frontend-fits-file-url?' + $.param(parameters);
+                    let url_request = 'dispatch-data/load_frontend_fits_file_url?' + $.param(parameters);
                     getFile(url_request, refresh_button_spinner);
                 }
             }
