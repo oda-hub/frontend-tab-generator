@@ -73,18 +73,24 @@ $form['{{ filters_par_name }}'] = array(
 {% endif %}
   '#type' => 'container',
   '#title' => t('Filters from fits file'),
+  {% if 'products' in par_detail %}
   '#states' => array(
-      'visible' => array(
-            ':input[name="' . $mform_id . '{{ filters_par_name }}_type"]' => array(
-              array('value' => 'file'), 'or', array('value' => 'url')
-            )
-        ),
-        'enabled' => array(
-            ':input[name="' . $mform_id . '{{ filters_par_name }}_type"]' => array(
-              array('value' => 'url'), 'or', array('value' => 'file')
-            )
-        )
+    {% set ns = namespace(prod_sets = []) %}
+    {% for x in par_detail.products %}
+    {% set ns.prod_sets = ns.prod_sets + ["array('value' => '%s')" % x] %}
+    {% endfor %}
+    'visible' => array(
+      ':input[name="' . $mform_id . 'product_type"]' => array(
+        {{ ", 'or', ".join(ns.prod_sets) }}
+      ),
+    ),
+    'enabled' => array(
+      ':input[name="' . $mform_id . 'product_type"]' => array(
+        {{ ", 'or', ".join(ns.prod_sets) }}
+      ),
+    )
   ),
+{% endif %}
   '#attributes' => array(
     'class' => array(
       'euclid-instruments-filters',

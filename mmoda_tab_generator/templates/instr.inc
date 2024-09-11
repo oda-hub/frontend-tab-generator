@@ -46,6 +46,7 @@
         {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
         '#default_value' => t($instrument_defaults['{{ par_name }}']),
         {% endif %}
+        /** TODO is this if really needed */
         {% if 'products' in par_detail %}
           '#states' => array(
             {% set ns = namespace(prod_sets = []) %}
