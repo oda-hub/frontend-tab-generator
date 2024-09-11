@@ -72,7 +72,6 @@ $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_pa
 $form['{{ filters_par_name }}'] = array(
 {% endif %}
   '#type' => 'container',
-  '#title' => t('Filters from fits file'),
   {% if 'products' in par_detail %}
   '#states' => array(
     {% set ns = namespace(prod_sets = []) %}
