@@ -30,3 +30,7 @@
 .no-padding-right {
   padding-right: 6px !important;
 }
+
+.confirmation-refresh-url-container {
+  margin-top: 0.5rem;
+}

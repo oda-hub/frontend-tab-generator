@@ -11,13 +11,15 @@
     var keys_NZ_Prior_I = ['i', 'mag', 'f', 'fl', 'flux', '_i', 'i_', '.i', 'i.'];
     var keys_Ztrue = ['z', '_z', 'z_', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'];
 
-    function getFile(file_path, clicked_component=null) {
+    function getFile(file_path, clicked_component=null, text_confimation=null) {
         return fetch(file_path)
             .then((response) => {
                 if (clicked_component !== null) {
                     clicked_component.siblings('i').hide();
                     clicked_component.show();
                 }
+                if (text_confimation !== null)
+                    text_confimation.text('File loaded successfully');
                 if (!response.ok) {
                     throw new Error(`Error during the loading of the fits file, status = ${response.status}`);
                 }
@@ -29,11 +31,13 @@
                     clicked_component.siblings('i').hide();
                     clicked_component.show();
                 }
+                if (text_confimation !== null)
+                    text_confimation.text('Error in loading the file');
                 console.error('Error fetching or reading file:', error);
             });
     }
 
-    function readFile(arrayBuffer, id_selector) {
+    function readFile(arrayBuffer) {
         //FITS file object containing the file headers and data units
         //Library entry point expects a FITS file array buffer
 	    let fits_file = window.FITSReader.parseFITS(arrayBuffer);
@@ -133,10 +137,13 @@
                 let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
                                         .append($('<span>').addClass('glyphicon glyphicon-refresh'))
                                         .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
+                let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
+                                        .append($('<span>').addClass('confirmation-msg-refresh-url'));
                 reload_fits_button.on('click', reload_fits_button_click);
                 let file_url_textfield_input = file_url_textfield.children('input');
                 let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
                 file_url_textfield.append(container_textfield_and_button[0]);
+                file_url_textfield.append(reload_fits_label_confirmation[0]);
             }
             let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
 
@@ -145,7 +152,7 @@
                     let file = event.target.files[0];
                     let id_selector = event.target.id;
                     file.arrayBuffer().then(arrayBuffer => {
-                        readFile(arrayBuffer, id_selector);
+                        readFile(arrayBuffer);
                     }).catch(error => {
                         console.error('Error reading file as ArrayBuffer:', error);
                     });
@@ -164,6 +171,8 @@
         let refresh_button_spinner = $('.button-refresh-url span');
         refresh_button_spinner.hide();
         refresh_button_spinner.siblings('i').show();
+        let text_confimation_span = $('.confirmation-msg-refresh-url');
+        text_confimation_span.text('');
         let fits_file_url = refresh_button.siblings('input').val();
 
         AJAX_call_get_token().done(
@@ -172,7 +181,7 @@
                     let token = data.token;
                     parameters = {"fits_file_url": fits_file_url, "token": token};
                     let url_request = 'dispatch-data/load_frontend_fits_file_url?' + $.param(parameters);
-                    getFile(url_request, refresh_button_spinner);
+                    getFile(url_request, refresh_button_spinner, text_confimation_span);
                 }
             }
         ).error(function(jqXHR, textStatus, errorThrown) {
