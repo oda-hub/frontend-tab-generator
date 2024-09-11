@@ -107,7 +107,6 @@ $form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
 {% endif %}
   '#type' => 'select',
   '#title' => t('Filter'),
-  '#required' => TRUE,
   '#options' => $instruments_filters,
   '#parent_classes' => array(
     'col-md-4',
@@ -122,8 +121,7 @@ $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_pa
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
 {% endif %}
   '#type' => 'select',
-  '#title' => t('Flux column name'),
-  '#required' => TRUE,
+  '#title' => t('Flux/Mag column'),
   '#options' => array(),
   '#parent_classes' => array(
     'col-md-3 '
@@ -135,8 +133,7 @@ $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_pa
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
 {% endif %}
   '#type' => 'select',
-  '#title' => t('Flux error column name'),
-  '#required' => TRUE,
+  '#title' => t('Flux/Mag error column'),
   '#options' => array(),
   '#parent_classes' => array(
     'col-md-3'
