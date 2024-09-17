@@ -37,7 +37,7 @@
       {% endif %}
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
         {% if element == 'type' %}
-        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}{{ par_name }}"{% endif %},
+        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}t("{{ par_name }}"){% endif %},
         {% elif element == 'url' %}
         '#title' => t('File URL'),
         {% else %}
