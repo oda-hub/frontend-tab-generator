@@ -23,7 +23,7 @@
           )
         ),
     {% endif %}
-    '#prefix' => '<hr><label class="control-label">{{ par_detail['extra_metadata']['group'] }}</label><div class="row">',
+    '#prefix' => '<hr><label class="control-label">{{ par_detail['extra_metadata']['group'] }}</label><div class="row multivalued-value">',
     '#suffix' => '</div><hr>'
     );
   {% endif %}
@@ -37,7 +37,7 @@
       {% endif %}
         '#type' => {% if element == 'type' %}'radios'{% elif element == 'url' %}'textfield'{% else %}'file'{% endif %},
         {% if element == 'type' %}
-        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}t("{{ par_name }}"){% endif %},
+        '#title' => {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}t("{{ par_detail['extra_metadata']['label'] }}"){% else %}{{ par_name }}"{% endif %},
         {% elif element == 'url' %}
         '#title' => t('File URL'),
         {% else %}
@@ -46,7 +46,6 @@
         {% if element == 'url' and 'http://odahub.io/ontology#FileURL' in par_detail['owl_uri'] %}
         '#default_value' => t($instrument_defaults['{{ par_name }}']),
         {% endif %}
-        /** TODO is this if really needed */
         {% if 'products' in par_detail %}
           '#states' => array(
             {% set ns = namespace(prod_sets = []) %}
@@ -83,9 +82,6 @@
             {% else %}
             'name' => $mform_id . '{{ par_name }}_{{ element }}',
             {% endif %}
-            'class' => array(
-                'no-padding-right'
-            )
           ),
           {% if element == 'type' %}
           '#options' => array(
@@ -100,7 +96,7 @@
           {% endif %}
           '#parent_classes' => array(
             'form-group',
-            'col-md-11'
+            'col-md-8'
           ),
 
           '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
@@ -274,7 +270,7 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
 
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
     {% if euclid_table_parname is not none and par_name == euclid_table_parname %}
-{{ euclid_form_field(par_name, par_detail) }}
+{{ euclid_form_field(par_name) }}
     {% else %}
 {{ formfield(par_name, par_detail, built_container_group_list) }}
     {% endif %}
