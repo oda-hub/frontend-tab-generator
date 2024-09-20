@@ -71,10 +71,10 @@
                 adapted_str_err.unshift(f2);
 
                 let list_columns_names_ordered = guess_columns(data.columns, adapted_str_flux);
-                let list_comun_errors_ordered = guess_columns(data.columns, adapted_str_err);
+                let list_columns_errors_ordered = guess_columns(data.columns, adapted_str_err);
 
                 selector_filter_flux.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_names_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
-                selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_comun_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
+                selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
             }
         });
 
