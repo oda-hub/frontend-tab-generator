@@ -83,7 +83,7 @@
             'name' => $mform_id . '{{ par_name }}_{{ element }}',
             {% endif %}
             'class' => array(
-                'no-padding-right'
+                'file-url-text-padding'
             )
           ),
           {% if element == 'type' %}

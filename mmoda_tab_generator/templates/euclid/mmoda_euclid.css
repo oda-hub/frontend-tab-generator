@@ -27,8 +27,9 @@
   float: right !important;
 }
 
-.no-padding-right {
+.file-url-text-padding {
   padding-right: 6px !important;
+  padding-left: 6px !important;
 }
 
 .confirmation-refresh-url-container {
