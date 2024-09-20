@@ -131,7 +131,7 @@
         let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
         if(instrument_filters_selector.length > 0)
             var id_container = instrument_filters_selector[0].parentElement.id;
-        if(typeof(id_container) !== 'undefined') {
+        if(typeof(id_container) !== 'undefined' && id_container !== "") {
             let file_url_textfield = $(`#${id_container} .form-type-textfield`);
             if(file_url_textfield.length > 0) {
                 let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
