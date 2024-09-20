@@ -150,7 +150,6 @@
             if(file_input.length > 0)
                 file_input[0].addEventListener('change', function(event) {
                     let file = event.target.files[0];
-                    let id_selector = event.target.id;
                     file.arrayBuffer().then(arrayBuffer => {
                         readFile(arrayBuffer);
                     }).catch(error => {
