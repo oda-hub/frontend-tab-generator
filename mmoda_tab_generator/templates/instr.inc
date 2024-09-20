@@ -23,7 +23,7 @@
           )
         ),
     {% endif %}
-    '#prefix' => '<hr><label class="control-label">{{ par_detail['extra_metadata']['group'] }}</label><div class="row multivalued-value">',
+    '#prefix' => '<hr><label class="control-label">{{ par_detail['extra_metadata']['group'] }}</label><div class="row">',
     '#suffix' => '</div><hr>'
     );
   {% endif %}
