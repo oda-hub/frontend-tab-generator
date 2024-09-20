@@ -270,7 +270,7 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
 
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
     {% if euclid_table_parname is not none and par_name == euclid_table_parname %}
-{{ euclid_form_field(par_name) }}
+{{ euclid_form_field(par_name, par_detail) }}
     {% else %}
 {{ formfield(par_name, par_detail, built_container_group_list) }}
     {% endif %}
