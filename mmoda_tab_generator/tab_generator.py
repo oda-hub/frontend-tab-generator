@@ -158,20 +158,6 @@ class MMODATabGenerator:
             with open(os.path.join(this_instr_js_path, js_fname), 'w') as fd:
                 fd.write(templ.render())
 
-            # TODO initially here during development
-            astrojsvis_repo_url = "git@github.com:esg-epfl-apc/astrojsvis.git"
-            fits_reader_repo_url = "git@github.com:esg-epfl-apc/fits-reader.git"
-            # astrojsvis_lib_path = os.path.join(this_instr_js_path, "astrojsvis")
-            # if os.path.exists(astrojsvis_lib_path):
-            #     shutil.rmtree(astrojsvis_lib_path)
-            fits_reader_lib_path = os.path.join(this_instr_js_path, "fits-reader")
-            if os.path.exists(fits_reader_lib_path):
-                shutil.rmtree(fits_reader_lib_path)
-
-            # subprocess.check_output(["git", "clone", "-b", "jsvis-prototype", "--single-branch",
-            #                          astrojsvis_repo_url, astrojsvis_lib_path])
-            subprocess.check_output(["git", "clone", fits_reader_repo_url, fits_reader_lib_path])
-
             with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
                 fd.write('Instrument,Filter\n')
                 for flt in euclid_filters_list:
