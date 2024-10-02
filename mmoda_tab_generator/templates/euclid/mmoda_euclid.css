@@ -17,3 +17,21 @@
   padding-left: 0px;
   margin-bottom: 15px !important;
 }
+
+.fits-url-container {
+  display: flex;
+}
+
+.button-refresh-url {
+  margin-left: 1em;
+  float: right !important;
+}
+
+.file-url-text-padding {
+  padding-right: 6px !important;
+  padding-left: 6px !important;
+}
+
+.confirmation-refresh-url-container {
+  margin-top: 0.5rem;
+}
