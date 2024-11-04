@@ -136,10 +136,11 @@
         '#type' => 'textfield',
         {% endif %}
         {% if 'extra_metadata' in par_detail and 'label' in par_detail['extra_metadata'] %}
-        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' .
-                    {% endif %}t("{{ par_detail['extra_metadata']['label'] }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
+        '#title' => {% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' .
+                    {% endif %}t("{{ par_detail['extra_metadata']['label'] }}"){% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
         {% else %}
-        '#title' => {% if 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' . {% endif %}t("{{ par_name }}"){% if 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
+        '#title' => {% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}'<span title="{{ par_detail['extra_metadata']['description'] }}">' .
+                    {% endif %}t("{{ par_name }}"){% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %} . '</span>' {% endif %},
         {% endif %}
         '#default_value' => $instrument_defaults['{{ par_name }}'],
         {% if par_detail.units and par_detail.units != 'str' %}
