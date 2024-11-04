@@ -165,20 +165,28 @@
         var photo_z_instrument_form_validator = {
             validators: {
                 notEmpty: {
-                    message: 'When Redshift value is select as a Prior, a value for Reshift prior has to be supplied'
+                    message: 'Mandatory parameter if Redshift prior is selected"'
                 }
             }
         };
-        $('.photoz_euclid-form.bv-form').data('bootstrapValidator').options.fields['mmoda_photoz_euclid_column_name_Nz_prior_I'] = photo_z_instrument_form_validator;
+
+        let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+        bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
+        // to be activated for when the page loads the first time
+        let priors_select_value = $('.form-item-priors select').val();
+        if(priors_select_value === 'Redshift')
+            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+        else
+            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
 
         let priors_select = $('.form-item-priors select');
         if (priors_select.length > 0) {
             priors_select[0].addEventListener('change', function(event) {
                 let priors_select_value = event.target.value;
-                if(priors_select_value === 'Redshift')
-                    $('.photoz_euclid-form.bv-form').bootstrapValidator('enableFieldValidators', 'mmoda_photoz_euclid_column_name_Nz_prior_I', true, 'notEmpty');
-                else
-                    $('.photoz_euclid-form.bv-form').bootstrapValidator('enableFieldValidators', 'mmoda_photoz_euclid_column_name_Nz_prior_I', false, 'notEmpty');
+                let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+                if(priors_select_value !== 'Redshift')
+                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
             });
         }
     }
