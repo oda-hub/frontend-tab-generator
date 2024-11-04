@@ -174,7 +174,6 @@
         let priors_select = $('.form-item-priors select');
         if (priors_select.length > 0) {
             priors_select[0].addEventListener('change', function(event) {
-                console.log(event.target.value);
                 let priors_select_value = event.target.value;
                 if(priors_select_value === 'Redshift')
                     $('.photoz_euclid-form.bv-form').bootstrapValidator('enableFieldValidators', 'mmoda_photoz_euclid_column_name_Nz_prior_I', true, 'notEmpty');
