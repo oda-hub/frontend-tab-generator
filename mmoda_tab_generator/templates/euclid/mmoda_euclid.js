@@ -11,6 +11,14 @@
     var keys_NZ_Prior_I = ['i', 'mag', 'f', 'fl', 'flux', '_i', 'i_', '.i', 'i.'];
     var keys_Ztrue = ['z', '_z', 'z_', '.z', 'z.', 'ref', 'sp', 'spe', 'spec'];
 
+    var photo_z_instrument_form_validator = {
+        validators: {
+            notEmpty: {
+                message: 'Mandatory parameter if Redshift prior is selected'
+            }
+        }
+    };
+
     function getFile(file_path, clicked_component=null, text_confimation=null) {
         return fetch(file_path)
             .then((response) => {
@@ -104,6 +112,16 @@
                 .concat(list_columns_names.map(column => ({value: column, text: column})))
                 .map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`)
                 .join('');
+
+            if(selectorName === 'mmoda_photoz_euclid_column_name_Nz_prior_I') {
+                let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+                bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
+                let priors_select_value = $('.form-item-priors select').val();
+                if(priors_select_value === 'Redshift')
+                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+                else
+                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+            }
         }
     }
 
@@ -160,6 +178,26 @@
                         console.error('Error reading file as ArrayBuffer:', error);
                     });
                 });
+        }
+
+        let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+        bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
+        // to be activated for when the page loads the first time
+        let priors_select_value = $('.form-item-priors select').val();
+        if(priors_select_value === 'Redshift')
+            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+        else
+            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+
+        let priors_select = $('.form-item-priors select');
+        if (priors_select.length > 0) {
+            priors_select[0].addEventListener('change', function(event) {
+                let priors_select_value = event.target.value;
+                let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+                if(priors_select_value !== 'Redshift')
+                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+            });
         }
     }
 
