@@ -14,7 +14,7 @@
     var photo_z_instrument_form_validator = {
         validators: {
             notEmpty: {
-                message: 'Mandatory parameter if Redshift prior is selected"'
+                message: 'Mandatory parameter if Redshift prior is selected'
             }
         }
     };
@@ -179,14 +179,6 @@
                     });
                 });
         }
-
-        var photo_z_instrument_form_validator = {
-            validators: {
-                notEmpty: {
-                    message: 'Mandatory parameter if Redshift prior is selected'
-                }
-            }
-        };
 
         let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
         bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
