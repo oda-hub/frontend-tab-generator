@@ -183,7 +183,7 @@
         var photo_z_instrument_form_validator = {
             validators: {
                 notEmpty: {
-                    message: 'Mandatory parameter if Redshift prior is selected"'
+                    message: 'Mandatory parameter if Redshift prior is selected'
                 }
             }
         };
