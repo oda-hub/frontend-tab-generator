@@ -10,13 +10,16 @@ if (_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $f
   );
 {%- endmacro -%}
 
-{% macro install_filters(filters_csv_name, filters_par_name) -%}
+{% macro install_filters(euclid_csv_file_name, euclid_table_params_dict) -%}
 $module_name = basename(__FILE__, '.install');
 $current_dir = drupal_get_path('module', $module_name);
+{% for product_name, filter_product_data in euclid_table_params_dict %}
+$filters_csv_name =  {{ euclid_csv_file_name | replace('{}', product_name) }};
 $filters = array();
 _mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters);
 unset($filters['Instrument']);
-$module_settings['{{ filters_par_name }}']=$filters;
+$module_settings['{{ filter_product_data[0] }}']=$filters;
+{% endfor %}
 {%- endmacro -%}
 
 {% macro read_filters_func() -%}
@@ -121,7 +124,7 @@ $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_pa
 {% else %}
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
 {% endif %}
-  '#type' => 'select',
+  '#type' => 'textfield',
   '#title' => t('Flux/Mag column'),
   '#required' => TRUE,
   '#options' => array(),
@@ -134,7 +137,7 @@ $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_pa
 {% else %}
 $form['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
 {% endif %}
-  '#type' => 'select',
+  '#type' => 'textfield',
   '#title' => t('Flux/Mag error column'),
   '#required' => TRUE,
   '#options' => array(),

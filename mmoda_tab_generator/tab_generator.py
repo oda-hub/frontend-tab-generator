@@ -105,14 +105,25 @@ class MMODATabGenerator:
         is_euclid = False
         euclid_table_parname = None
         euclid_filters_list = None
+
+        euclid_table_params_dict = None
         
         for pname, pval in param_dict.items():
             if euclid_table_uri in pval.get('owl_uri', []):
+                print("pname: ", pname)
+                print("pval: ", json.dumps(pval, indent=4))
                 is_euclid = True
-                euclid_table_parname = pname
-                euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
+                if euclid_table_params_dict is None:
+                    euclid_table_params_dict = {}
+                for product_param in pval['products']:
+                    if product_param not in euclid_table_params_dict:
+                        euclid_table_params_dict[product_param] = {}
+                    euclid_table_params_dict[product_param] = (pname, pval['restrictions']['schema']['properties']['filter']['items']['enum'])
+                # euclid_table_parname = pname
+                # euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
         
-        return is_euclid, euclid_table_parname, euclid_filters_list
+        # return is_euclid, euclid_table_parname, euclid_filters_list
+        return is_euclid, euclid_table_params_dict
 
     @staticmethod
     def snake_case(s):
@@ -140,10 +151,12 @@ class MMODATabGenerator:
         basename = os.path.join(this_instr_path, f"mmoda_{frontend_name}")
 
         css_fname = None
-        euclid_csv_name = 'euclid_filters.csv'
+        euclid_csv_name = 'euclid_filters_{}.csv'
+        euclid_csv_name_list= []
         
-        is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
-        
+        # is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
+        is_euclid, euclid_table_params_dict = self._check_euclid(param_dict)
+
         jenv = Environment(loader=PackageLoader('mmoda_tab_generator'))
         jenv.filters['snake_case'] = self.snake_case
         
@@ -158,10 +171,13 @@ class MMODATabGenerator:
             with open(os.path.join(this_instr_js_path, js_fname), 'w') as fd:
                 fd.write(templ.render())
 
-            with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
-                fd.write('Instrument,Filter\n')
-                for flt in euclid_filters_list:
-                    fd.write(','.join(flt.split('|'))+'\n')
+            for product_name in euclid_table_params_dict:
+                csv_file_name = euclid_csv_name.format(product_name)
+                euclid_csv_name_list.append(csv_file_name)
+                with open(os.path.join(this_instr_path, csv_file_name), 'w') as fd:
+                    fd.write('Instrument,Filter\n')
+                    for flt in euclid_table_params_dict[product_name][1]:
+                        fd.write(','.join(flt.split('|'))+'\n')
             
         templ = jenv.get_template('instr.info')
         with open(f"{basename}.info", 'w') as fd:
@@ -178,7 +194,8 @@ class MMODATabGenerator:
         templ = jenv.get_template('instr.install')
         defaults = []
         for k, v in param_dict.items():
-            if k != euclid_table_parname:
+            # if k != euclid_table_parname:
+            if k not in v['products']:
                 if isinstance(v['value'], bool):
                     defaults.append((k, int(v['value'])))
                 else:
@@ -195,8 +212,8 @@ class MMODATabGenerator:
                                   instrument_version=instrument_version,
                                   instrument_version_link=instrument_version_link,
                                   is_euclid=is_euclid,
-                                  euclid_csv_name=euclid_csv_name,
-                                  euclid_table_parname=euclid_table_parname))
+                                  euclid_csv_name_list=euclid_csv_name_list,
+                                  euclid_table_params_dict=euclid_table_params_dict))
 
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
@@ -205,7 +222,7 @@ class MMODATabGenerator:
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
                                   products_list = products_list,
-                                  euclid_table_parname = euclid_table_parname))
+                                  euclid_table_params_dict = euclid_table_params_dict))
         
         if help_page is not None:
             help_book_dir = os.path.join(this_instr_path, 'help_book')
