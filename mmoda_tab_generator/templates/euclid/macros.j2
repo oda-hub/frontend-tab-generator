@@ -10,14 +10,14 @@ if (_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $f
   );
 {%- endmacro -%}
 
-{% macro install_filters(euclid_csv_name_list, euclid_table_parname_list) -%}
+{% macro install_filters(euclid_csv_name_list, euclid_table_parname_list, euclid_product_name_list) -%}
   $module_name = basename(__FILE__, '.install');
   $current_dir = drupal_get_path('module', $module_name);
   {% for filters_csv_name in euclid_csv_name_list %}
     $filters = array();
     _mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters);
     unset($filters['Instrument']);
-    $module_settings['{{ euclid_table_parname_list[loop.index0] }}']=$filters;
+    $module_settings['{{ euclid_table_parname_list[loop.index0] }}_{{ euclid_product_name_list[loop.index0] }}']=$filters;
   {% endfor %}
 {%- endmacro -%}
 

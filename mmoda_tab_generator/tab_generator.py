@@ -218,6 +218,7 @@ class MMODATabGenerator:
                                   instrument_version_link=instrument_version_link,
                                   is_euclid=is_euclid,
                                   euclid_csv_name_list=euclid_csv_name_list,
+                                  euclid_product_name_list=euclid_product_name_list,
                                   euclid_table_parname_list=euclid_table_parname_list))
 
         templ = jenv.get_template('instr.inc')
@@ -227,7 +228,7 @@ class MMODATabGenerator:
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
                                   products_list = products_list,
-                                  is_euclid=is_euclid,
+                                  is_euclid = is_euclid,
                                   euclid_table_parname_list = euclid_table_parname_list))
         
         if help_page is not None:

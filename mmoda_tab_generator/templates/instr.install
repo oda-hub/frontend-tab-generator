@@ -65,7 +65,7 @@ function mmoda_{{ frontend_name }}_install()
   $module_settings= array_merge($instrument_info, $module_settings);
 
   {% if is_euclid %}
-    {{ euclid.install_filters(euclid_csv_name_list, euclid_table_parname_list) }}
+    {{ euclid.install_filters(euclid_csv_name_list, euclid_table_parname_list, euclid_product_name_list) }}
   {% endif %}
 
   $module_name = basename(__FILE__, '.install');
