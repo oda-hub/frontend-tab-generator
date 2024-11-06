@@ -182,7 +182,7 @@ class MMODATabGenerator:
                 euclid_csv_name_list.append(csv_file_name)
                 with open(os.path.join(this_instr_path, csv_file_name), 'w') as fd:
                     fd.write('Instrument,Filter\n')
-                    for flt in euclid_product_name_list[p_list_id]:
+                    for flt in euclid_filters_lists[p_list_id]:
                         fd.write(','.join(flt.split('|'))+'\n')
             
         templ = jenv.get_template('instr.info')
