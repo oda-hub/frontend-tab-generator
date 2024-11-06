@@ -56,9 +56,6 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 {# TODO: prefix-suffix, visibility etc #}
 {% macro euclid_form_field(filters_par_name, par_detail) -%}
 
-drupal_add_js('https://unpkg.com/fits-reader-js');
-drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/mmoda_euclid.js');
-
 $instruments_filters = array();
 foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filters) {
   if (! array_key_exists($instrument, $instruments_filters))

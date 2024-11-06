@@ -270,6 +270,11 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
     '#suffix' => '</div><hr class="hr-default" />'
   );
 
+  {% if is_euclid %}
+  drupal_add_js('https://unpkg.com/fits-reader-js');
+  drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/mmoda_euclid.js');
+  {% endif %}
+
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
     {% if par_name in euclid_table_parname_list %}
 {{ euclid_form_field(par_name, par_detail) }}
