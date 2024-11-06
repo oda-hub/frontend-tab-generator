@@ -151,33 +151,36 @@
     function commonReady() {
         // add the reload button for the fits file
         let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
-        if(instrument_filters_selector.length > 0)
-            var id_container = instrument_filters_selector[0].parentElement.id;
-        if(typeof(id_container) !== 'undefined' && id_container !== "") {
-            let file_url_textfield = $(`#${id_container} .form-type-textfield`);
-            if(file_url_textfield.length > 0) {
-                let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
-                                        .append($('<span>').addClass('glyphicon glyphicon-refresh'))
-                                        .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
-                let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
-                                        .append($('<span>').addClass('confirmation-msg-refresh-url'));
-                reload_fits_button.on('click', reload_fits_button_click);
-                let file_url_textfield_input = file_url_textfield.children('input');
-                let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
-                file_url_textfield.append(container_textfield_and_button[0]);
-                file_url_textfield.append(reload_fits_label_confirmation[0]);
-            }
-            let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
+        if(instrument_filters_selector.length > 0) {
+            for (let i = 0; i < instrument_filters_selector.length; i++) {
+                var id_container = instrument_filters_selector[i].parentElement.id;
+                if(typeof(id_container) !== 'undefined' && id_container !== "") {
+                    let file_url_textfield = $(`#${id_container} [class$="-url"],[class*="-url "]`);
+                    if(file_url_textfield.length > 0) {
+                        let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
+                                                .append($('<span>').addClass('glyphicon glyphicon-refresh'))
+                                                .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
+                        let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
+                                                .append($('<span>').addClass('confirmation-msg-refresh-url'));
+                        reload_fits_button.on('click', reload_fits_button_click);
+                        let file_url_textfield_input = file_url_textfield.children('input');
+                        let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
+                        file_url_textfield.append(container_textfield_and_button[0]);
+                        file_url_textfield.append(reload_fits_label_confirmation[0]);
+                    }
+                    let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
 
-            if(file_input.length > 0)
-                file_input[0].addEventListener('change', function(event) {
-                    let file = event.target.files[0];
-                    file.arrayBuffer().then(arrayBuffer => {
-                        readFile(arrayBuffer);
-                    }).catch(error => {
-                        console.error('Error reading file as ArrayBuffer:', error);
-                    });
-                });
+                    if(file_input.length > 0)
+                        file_input[0].addEventListener('change', function(event) {
+                            let file = event.target.files[0];
+                            file.arrayBuffer().then(arrayBuffer => {
+                                readFile(arrayBuffer);
+                            }).catch(error => {
+                                console.error('Error reading file as ArrayBuffer:', error);
+                            });
+                        });
+                }
+            }
         }
 
         let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
