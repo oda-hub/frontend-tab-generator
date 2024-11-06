@@ -77,10 +77,10 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
     {% if 'products' in par_detail %}
     '#states' => array(
       'visible' => array(
-        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => product_name)),
+        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => '{{ product_name }}')),
       ),
       'enabled' => array(
-        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => product_name)),
+        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => '{{ product_name }}')),
       )
     ),
   {% endif %}
@@ -90,7 +90,7 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
          'multivalued-field',
          'col-md-12'
       ),
-      'param_name' => '{{ filters_par_name }}'
+      'multivalued_field_param_name' => '{{ filters_par_name }}'
     ),
     '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr>'{% else %}''{% endif %}
   );
