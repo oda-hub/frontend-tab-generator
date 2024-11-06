@@ -137,7 +137,7 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
   );
 
   drupal_add_js(array(
-      'euclid-filters_{{ product_name }}' => $instrument_defaults['{{ filters_par_name }}_{{ product_name }}']
+      'euclid-filters_{{ product_name }}' => $instrument_defaults['{{ filters_par_name }}']
     ), 'setting');
 {% endfor %}
 {%- endmacro -%}
