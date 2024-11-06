@@ -191,8 +191,7 @@ class MMODATabGenerator:
         templ = jenv.get_template('instr.install')
         defaults = []
         for k, v in param_dict.items():
-            # if k != euclid_table_parname:
-            if k not in v['products']:
+            if k not in euclid_table_parname_list:
                 if isinstance(v['value'], bool):
                     defaults.append((k, int(v['value'])))
                 else:
