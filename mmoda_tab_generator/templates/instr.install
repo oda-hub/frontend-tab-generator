@@ -30,8 +30,8 @@ function mmoda_{{ frontend_name }}_requirements($phase)
   $conflicts = array();
   if ('install' == $phase) {
     {% if is_euclid %}
-        {% for csv_file_name in euclid_csv_name_list %}
-      {{ euclid.filters_file_req(csv_file_name) }}
+        {% for filters_csv_name in euclid_csv_name_list %}
+    {{ euclid.filters_file_req(filters_csv_name) }}
         {% endfor %}
     {% endif %}
   }
@@ -65,7 +65,7 @@ function mmoda_{{ frontend_name }}_install()
   $module_settings= array_merge($instrument_info, $module_settings);
 
   {% if is_euclid %}
-    {{ euclid.install_filters(euclid_csv_name_list, euclid_table_params_dict) }}
+    {{ euclid.install_filters(euclid_csv_name_list, euclid_table_parname_list) }}
   {% endif %}
 
   $module_name = basename(__FILE__, '.install');
