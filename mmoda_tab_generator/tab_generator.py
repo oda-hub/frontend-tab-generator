@@ -64,8 +64,6 @@ class MMODATabGenerator:
     def _arrange_data(self, instrument_name):
         jmeta = self._request_data(instrument_name)
 
-        print("param_dict: ", json.dumps(jmeta, indent=4))
-                
         param_dict = {}
         products_list = []
         
