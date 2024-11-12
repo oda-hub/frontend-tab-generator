@@ -103,7 +103,7 @@
         if (inputElement.length > 0) {
             let selectElement = $('<select></select>').addClass(selectClass);
             $.each(inputElement[0].attributes, function(index, attribute) {
-                if (attribute.name === 'name' || attribute.name === 'id') {
+                if (attribute.name === 'name' || attribute.name === 'id' || attribute.name === 'multivalued_field_param_name') {
                     selectElement.attr(attribute.name, attribute.value);
                 }
             });
