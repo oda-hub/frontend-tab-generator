@@ -19,7 +19,7 @@
         }
     };
 
-    function getFile(file_path, clicked_component=null, text_confimation=null) {
+    function getFile(file_path, id_container, clicked_component=null, text_confimation=null) {
         return fetch(file_path)
             .then((response) => {
                 if (clicked_component !== null) {
@@ -33,7 +33,7 @@
                 }
                 return response.arrayBuffer();
             })
-            .then((buffer) => readFile(buffer))
+            .then((buffer) => readFile(buffer, id_container))
             .catch((error) => {
                 if (clicked_component !== null) {
                     clicked_component.siblings('i').hide();
@@ -45,7 +45,7 @@
             });
     }
 
-    function readFile(arrayBuffer) {
+    function readFile(arrayBuffer, id_container) {
         //FITS file object containing the file headers and data units
         //Library entry point expects a FITS file array buffer
 	    let fits_file = window.FITSReader.parseFITS(arrayBuffer);
@@ -56,7 +56,7 @@
         if(hdu != null) {
             let data = hdu.data;
 
-            let selector_container = document.querySelectorAll('.euclid-instruments-filters.multivalued-field');
+            let selector_container = document.querySelectorAll(`#${id_container} .euclid-instruments-filters.multivalued-field`);
 
             selector_container[0].addEventListener('change', function(event) {
                 let selector_filter = event.target;
@@ -98,30 +98,35 @@
 
     }
 
-    function updateSelectorList(selectorName, keys, cols) {
-        let input_selector = document.querySelector(`[name="${selectorName}"]`);
-        if (input_selector !== null) {
-            let select_selector = $('<select class="form-control from-select"></select>');
-            $.each(input_selector.attributes, function(index, attribute) {
-                if (attribute.name === 'name' || attribute.name === 'id')
-                    select_selector.attr(attribute.name, attribute.value);
+    function replaceInputWithSelect(object_identifier, selectClass, keys=undefined, cols=undefined) {
+        let inputElement = $(`${object_identifier}`);
+        if (inputElement.length > 0) {
+            let selectElement = $('<select></select>').addClass(selectClass);
+            $.each(inputElement[0].attributes, function(index, attribute) {
+                if (attribute.name === 'name' || attribute.name === 'id') {
+                    selectElement.attr(attribute.name, attribute.value);
+                }
             });
-            input_selector.replaceWith(select_selector[0]);
-            let list_columns_names = guess_columns(cols, keys, true);
-            select_selector[0].innerHTML = []
-                .concat(list_columns_names.map(column => ({value: column, text: column})))
-                .map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`)
-                .join('');
+            inputElement.replaceWith(selectElement[0]);
+            selectElement[0].innerHTML = '<option value="" selected="selected">- Select -</option>';
 
-            if(selectorName === 'mmoda_photoz_euclid_column_name_Nz_prior_I') {
-                let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
-                bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
-                let priors_select_value = $('.form-item-priors select').val();
-                if(priors_select_value === 'Redshift')
-                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
-                else
-                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+            if (typeof(keys) !== 'undefined' && typeof(cols) !== 'undefined') {
+                let list_columns_names = guess_columns(cols, keys, true);
+                selectElement[0].innerHTML += list_columns_names.map(column => ({value: column, text: column})).map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
             }
+        }
+    }
+
+    function updateSelectorList(selectorName, keys, cols) {
+        replaceInputWithSelect(`[name="${selectorName}"]`, "form-control from-select", keys, cols);
+        if(selectorName === 'mmoda_photoz_euclid_column_name_Nz_prior_I') {
+            let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+            bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
+            let priors_select_value = $('.form-item-priors select').val();
+            if(priors_select_value === 'Redshift')
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+            else
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
         }
     }
 
@@ -153,7 +158,7 @@
         let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
         if(instrument_filters_selector.length > 0) {
             for (let i = 0; i < instrument_filters_selector.length; i++) {
-                var id_container = instrument_filters_selector[i].parentElement.id;
+                let id_container = instrument_filters_selector[i].parentElement.id;
                 if(typeof(id_container) !== 'undefined' && id_container !== "") {
                     let file_url_textfield = $(`#${id_container} [class$="-url"],[class*="-url "]`);
                     if(file_url_textfield.length > 0) {
@@ -169,6 +174,9 @@
                         let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
                         file_url_textfield.append(container_textfield_and_button[0]);
                         file_url_textfield.append(reload_fits_label_confirmation[0]);
+
+                        replaceInputWithSelect(`#${id_container} input[id$="flux-"]`, 'form-control from-select');
+                        replaceInputWithSelect(`#${id_container} input[id$="flux-error-"]`,  'form-control from-select');
                     }
                     let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
 
@@ -176,7 +184,7 @@
                         file_input[0].addEventListener('change', function(event) {
                             let file = event.target.files[0];
                             file.arrayBuffer().then(arrayBuffer => {
-                                readFile(arrayBuffer);
+                                readFile(arrayBuffer, id_container);
                             }).catch(error => {
                                 console.error('Error reading file as ArrayBuffer:', error);
                             });
@@ -227,7 +235,7 @@
                     let token = data.token;
                     parameters = {"fits_file_url": fits_file_url, "token": token};
                     let url_request = 'dispatch-data/load_frontend_fits_file_url?' + $.param(parameters);
-                    getFile(url_request, refresh_button_spinner, text_confimation_span);
+                    getFile(url_request, id_container, refresh_button_spinner, text_confimation_span);
                 }
             }
         ).error(function(jqXHR, textStatus, errorThrown) {
