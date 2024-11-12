@@ -162,7 +162,9 @@
                                                 .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
                         let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
                                                 .append($('<span>').addClass('confirmation-msg-refresh-url'));
-                        reload_fits_button.on('click', reload_fits_button_click);
+                        reload_fits_button.on('click', (event) => {
+                            reload_fits_button_click(event, id_container);
+                        });
                         let file_url_textfield_input = file_url_textfield.children('input');
                         let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
                         file_url_textfield.append(container_textfield_and_button[0]);
@@ -210,12 +212,12 @@
         });
     }
 
-    function reload_fits_button_click(event) {
-        let refresh_button = $('.button-refresh-url');
-        let refresh_button_spinner = $('.button-refresh-url span');
+    function reload_fits_button_click(event, id_container) {
+        let refresh_button = $(`#${id_container} .button-refresh-url`);
+        let refresh_button_spinner = $(`#${id_container} .button-refresh-url span`);
         refresh_button_spinner.hide();
         refresh_button_spinner.siblings('i').show();
-        let text_confimation_span = $('.confirmation-msg-refresh-url');
+        let text_confimation_span = $(`#${id_container} .confirmation-msg-refresh-url`);
         text_confimation_span.text('');
         let fits_file_url = refresh_button.siblings('input').val();
 
