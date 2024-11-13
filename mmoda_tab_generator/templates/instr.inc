@@ -105,7 +105,7 @@
           '#prefix' => '{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}
                     {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
 
-          '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
+          '#suffix' => '{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}'
 
       );
     {% endfor %}
@@ -276,7 +276,7 @@ function mmoda_{{ frontend_name }}($form, &$form_state)
   {% endif %}
 
   {% for par_name, par_detail in param_dict.items() if not par_detail['in_instr_query'] %}
-    {% if par_name in euclid_table_parname_list %}
+    {% if euclid_table_parname_list and par_name in euclid_table_parname_list %}
 {{ euclid_form_field(par_name, par_detail) }}
     {% else %}
 {{ formfield(par_name, par_detail, built_container_group_list) }}

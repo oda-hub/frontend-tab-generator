@@ -86,12 +86,16 @@
                     selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
                 }
             });
-
-            updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
+            if ($('mmoda_photoz_euclid_column_name_MW_EBV').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
+            if ($('mmoda_photoz_euclid_column_name_RA').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
+            if ($('mmoda_photoz_euclid_column_name_DEC').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
+            if ($('mmoda_photoz_euclid_column_name_Ztrue').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
+            if ($('mmoda_photoz_euclid_column_name_Nz_prior_I').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
         }
         else
             console.error(`Error: HDU not found at the index ${hdu_index}`);
@@ -160,7 +164,7 @@
             for (let i = 0; i < instrument_filters_selector.length; i++) {
                 let id_container = instrument_filters_selector[i].parentElement.id;
                 if(typeof(id_container) !== 'undefined' && id_container !== "") {
-                    let file_url_textfield = $(`#${id_container} [class$="-url"],[class*="-url "]`);
+                    let file_url_textfield = $(`#${id_container} [class$="-url"], #${id_container} [class*="-url "]`);
                     if(file_url_textfield.length > 0) {
                         let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
                                                 .append($('<span>').addClass('glyphicon glyphicon-refresh'))
@@ -196,14 +200,14 @@
         let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
         bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
         // to be activated for when the page loads the first time
-        let priors_select_value = $('.form-item-priors select').val();
-        if(priors_select_value === 'Redshift')
-            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
-        else
-            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
-
         let priors_select = $('.form-item-priors select');
         if (priors_select.length > 0) {
+            let priors_select_value = $('.form-item-priors select').val();
+            if(priors_select_value === 'Redshift')
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+            else
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+
             priors_select[0].addEventListener('change', function(event) {
                 let priors_select_value = event.target.value;
                 let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
