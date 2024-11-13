@@ -86,15 +86,15 @@
                     selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
                 }
             });
-            if ($('mmoda_photoz_euclid_column_name_MW_EBV').length > 0)
+            if ($('[name="mmoda_photoz_euclid_column_name_MW_EBV"]').length > 0)
                 updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
-            if ($('mmoda_photoz_euclid_column_name_RA').length > 0)
+            if ($('[name="mmoda_photoz_euclid_column_name_RA"]').length > 0)
                 updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
-            if ($('mmoda_photoz_euclid_column_name_DEC').length > 0)
+            if ($('[name="mmoda_photoz_euclid_column_name_DEC"]').length > 0)
                 updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
-            if ($('mmoda_photoz_euclid_column_name_Ztrue').length > 0)
+            if ($('[name="mmoda_photoz_euclid_column_name_Ztrue"]').length > 0)
                 updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
-            if ($('mmoda_photoz_euclid_column_name_Nz_prior_I').length > 0)
+            if ($('[name="mmoda_photoz_euclid_column_name_Nz_prior_I"]').length > 0)
                 updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
         }
         else
