@@ -105,19 +105,25 @@
     function replaceInputWithSelect(object_identifier, selectClass, keys=undefined, cols=undefined) {
         let inputElement = $(`${object_identifier}`);
         if (inputElement.length > 0) {
-            let selectElement = $('<select></select>').addClass(selectClass);
-            $.each(inputElement[0].attributes, function(index, attribute) {
-                if (attribute.name === 'name' || attribute.name === 'id' || attribute.name === 'multivalued_field_param_name') {
-                    selectElement.attr(attribute.name, attribute.value);
+            $.each(inputElement, function(index, element) {
+                let selectElement = $('<select></select>').addClass(selectClass);
+                selectElement.append($('<option>', {value: "", text: "- Select -", selected: 'selected'}));
+                $.each(element.attributes, function(index, attribute) {
+                    if (attribute.name === 'name' || attribute.name === 'id' ||
+                        attribute.name === 'multivalued_field_param_name' || attribute.name === 'multivalued_field_product_name') {
+                        selectElement.attr(attribute.name, attribute.value);
+                    }
+                });
+                element.replaceWith(selectElement[0]);
+                if(element.value !== '')
+                    selectElement.append($('<option>', {value: element.value, text: element.value, selected: 'selected'}));
+
+                if (typeof(keys) !== 'undefined' && typeof(cols) !== 'undefined') {
+                    let list_columns_names = guess_columns(cols, keys, true);
+                    selectElement[0].innerHTML += list_columns_names.map(column => ({value: column, text: column})).map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
                 }
             });
-            inputElement.replaceWith(selectElement[0]);
-            selectElement[0].innerHTML = '<option value="" selected="selected">- Select -</option>';
 
-            if (typeof(keys) !== 'undefined' && typeof(cols) !== 'undefined') {
-                let list_columns_names = guess_columns(cols, keys, true);
-                selectElement[0].innerHTML += list_columns_names.map(column => ({value: column, text: column})).map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
-            }
         }
     }
 
