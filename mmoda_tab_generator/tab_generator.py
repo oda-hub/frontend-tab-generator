@@ -10,7 +10,7 @@ from mmoda_tab_generator import Config
 import time
 import jwt
 import logging
-import subprocess
+import itertools
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ class MMODATabGenerator:
 
     def _arrange_data(self, instrument_name):
         jmeta = self._request_data(instrument_name)
-                
+
         param_dict = {}
         products_list = []
         
@@ -79,22 +79,32 @@ class MMODATabGenerator:
             param_dict[par['name']] = par
             param_dict[par['name']]['in_instr_query'] = True
 
+        items_list = []
         for _item in jmeta[0][4:]:
             if isinstance(_item, str):
                 item = json.loads(_item)
             else:
                 item = _item
-            product_name = item[1]['product_name']
-            products_list.append(product_name)
-            for par in item[2:]:
-                if par['name'] == 'T_format':
-                    continue
-                if par['name'] in param_dict.keys():
-                    param_dict[par['name']]['products'].append(product_name)
-                else:
-                    param_dict[par['name']] = par
-                    param_dict[par['name']]['products'] = [product_name]
-                param_dict[par['name']]['in_instr_query'] = False
+            items_list.append(item)
+
+        for items in itertools.zip_longest(*items_list):
+            for _id, _item in enumerate(items):
+                if _item is not None:
+                    if isinstance(_item, str):
+                        item = json.loads(_item)
+                    else:
+                        item = _item
+                    if 'product_name' in item:
+                        products_list.append(item['product_name'])
+                    if 'name' in item:
+                        if item['name'] == 'T_format':
+                            continue
+                        if item['name'] in param_dict.keys():
+                            param_dict[item['name']]['products'].append(products_list[_id])
+                        else:
+                            param_dict[item['name']] = item
+                            param_dict[item['name']]['products'] = [products_list[_id]]
+                        param_dict[item['name']]['in_instr_query'] = False
 
         return param_dict, products_list
 
@@ -103,16 +113,22 @@ class MMODATabGenerator:
         euclid_table_uri = 'http://odahub.io/ontology#PhosphorosFiltersTable' 
         
         is_euclid = False
-        euclid_table_parname = None
-        euclid_filters_list = None
-        
+        euclid_filters_lists = euclid_table_parname_list = euclid_product_name_list = None
+
         for pname, pval in param_dict.items():
             if euclid_table_uri in pval.get('owl_uri', []):
                 is_euclid = True
-                euclid_table_parname = pname
-                euclid_filters_list = pval['restrictions']['schema']['properties']['filter']['items']['enum']
-        
-        return is_euclid, euclid_table_parname, euclid_filters_list
+                if euclid_table_parname_list is None:
+                    euclid_table_parname_list = []
+                euclid_table_parname_list.append(pname)
+                if euclid_filters_lists is None:
+                    euclid_filters_lists = []
+                euclid_filters_lists.append(pval['restrictions']['schema']['properties']['filter']['items']['enum'])
+                if euclid_product_name_list is None:
+                    euclid_product_name_list = []
+                euclid_product_name_list.append(pval['products'][0])
+
+        return is_euclid, euclid_table_parname_list, euclid_filters_lists, euclid_product_name_list
 
     @staticmethod
     def snake_case(s):
@@ -132,7 +148,7 @@ class MMODATabGenerator:
                  instrument_version_link=None,
                  help_page = None):
         param_dict, products_list = self._arrange_data(instrument_name)
-        
+
         this_instr_path = os.path.join(instruments_dir_path, f"mmoda_{frontend_name}")
         os.makedirs(this_instr_path, exist_ok=True)
         this_instr_js_path = os.path.join(this_instr_path, "js")
@@ -140,10 +156,11 @@ class MMODATabGenerator:
         basename = os.path.join(this_instr_path, f"mmoda_{frontend_name}")
 
         css_fname = None
-        euclid_csv_name = 'euclid_filters.csv'
-        
-        is_euclid, euclid_table_parname, euclid_filters_list = self._check_euclid(param_dict)
-        
+        euclid_csv_name = 'euclid_filters_{}.csv'
+        euclid_csv_name_list = []
+
+        is_euclid, euclid_table_parname_list, euclid_filters_lists, euclid_product_name_list = self._check_euclid(param_dict)
+
         jenv = Environment(loader=PackageLoader('mmoda_tab_generator'))
         jenv.filters['snake_case'] = self.snake_case
         
@@ -158,10 +175,13 @@ class MMODATabGenerator:
             with open(os.path.join(this_instr_js_path, js_fname), 'w') as fd:
                 fd.write(templ.render())
 
-            with open(os.path.join(this_instr_path, euclid_csv_name), 'w') as fd:
-                fd.write('Instrument,Filter\n')
-                for flt in euclid_filters_list:
-                    fd.write(','.join(flt.split('|'))+'\n')
+            for p_list_id, product_name in enumerate(euclid_product_name_list):
+                csv_file_name = euclid_csv_name.format(product_name)
+                euclid_csv_name_list.append(csv_file_name)
+                with open(os.path.join(this_instr_path, csv_file_name), 'w') as fd:
+                    fd.write('Instrument,Filter\n')
+                    for flt in euclid_filters_lists[p_list_id]:
+                        fd.write(','.join(flt.split('|'))+'\n')
             
         templ = jenv.get_template('instr.info')
         with open(f"{basename}.info", 'w') as fd:
@@ -178,7 +198,7 @@ class MMODATabGenerator:
         templ = jenv.get_template('instr.install')
         defaults = []
         for k, v in param_dict.items():
-            if k != euclid_table_parname:
+            if euclid_table_parname_list is None or k not in euclid_table_parname_list:
                 if isinstance(v['value'], bool):
                     defaults.append((k, int(v['value'])))
                 else:
@@ -195,8 +215,9 @@ class MMODATabGenerator:
                                   instrument_version=instrument_version,
                                   instrument_version_link=instrument_version_link,
                                   is_euclid=is_euclid,
-                                  euclid_csv_name=euclid_csv_name,
-                                  euclid_table_parname=euclid_table_parname))
+                                  euclid_csv_name_list=euclid_csv_name_list,
+                                  euclid_product_name_list=euclid_product_name_list,
+                                  euclid_table_parname_list=euclid_table_parname_list))
 
         templ = jenv.get_template('instr.inc')
         with open(f"{basename}.inc", 'w') as fd:
@@ -205,7 +226,8 @@ class MMODATabGenerator:
                                   dispatcher_name = instrument_name,
                                   param_dict = param_dict,
                                   products_list = products_list,
-                                  euclid_table_parname = euclid_table_parname))
+                                  is_euclid = is_euclid,
+                                  euclid_table_parname_list = euclid_table_parname_list))
         
         if help_page is not None:
             help_book_dir = os.path.join(this_instr_path, 'help_book')

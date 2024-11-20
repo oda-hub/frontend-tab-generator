@@ -10,13 +10,15 @@ if (_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $f
   );
 {%- endmacro -%}
 
-{% macro install_filters(filters_csv_name, filters_par_name) -%}
-$module_name = basename(__FILE__, '.install');
-$current_dir = drupal_get_path('module', $module_name);
-$filters = array();
-_mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters);
-unset($filters['Instrument']);
-$module_settings['{{ filters_par_name }}']=$filters;
+{% macro install_filters(euclid_csv_name_list, euclid_table_parname_list, euclid_product_name_list) -%}
+  $module_name = basename(__FILE__, '.install');
+  $current_dir = drupal_get_path('module', $module_name);
+  {% for filters_csv_name in euclid_csv_name_list %}
+    $filters = array();
+    _mmoda_euclid_read_filters_file($current_dir . '/{{ filters_csv_name }}', $filters);
+    unset($filters['Instrument']);
+    $module_settings['{{ euclid_table_parname_list[loop.index0] }}_{{ euclid_product_name_list[loop.index0] }}']=$filters;
+  {% endfor %}
 {%- endmacro -%}
 
 {% macro read_filters_func() -%}
@@ -54,9 +56,6 @@ function _mmoda_euclid_read_filters_file($filename, &$filters)
 {# TODO: prefix-suffix, visibility etc #}
 {% macro euclid_form_field(filters_par_name, par_detail) -%}
 
-drupal_add_js('https://unpkg.com/fits-reader-js');
-drupal_add_js(drupal_get_path('module', 'mmoda_photoz_euclid') . '/js/mmoda_euclid.js');
-
 $instruments_filters = array();
 foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filters) {
   if (! array_key_exists($instrument, $instruments_filters))
@@ -65,87 +64,92 @@ foreach ($instrument_defaults['{{ filters_par_name }}'] as $instrument => $filte
     $instruments_filters[$instrument][$instrument . '|' . $filter] = $filter;
   }
 }
-
-{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}'] = array(
-{% else %}
-$form['{{ filters_par_name }}'] = array(
-{% endif %}
-  '#type' => 'container',
-  {% if 'products' in par_detail %}
-  '#states' => array(
-    {% set ns = namespace(prod_sets = []) %}
-    {% for x in par_detail.products %}
-    {% set ns.prod_sets = ns.prod_sets + ["array('value' => '%s')" % x] %}
-    {% endfor %}
-    'visible' => array(
-      ':input[name="' . $mform_id . 'product_type"]' => array(
-        {{ ", 'or', ".join(ns.prod_sets) }}
+{% for product_name in par_detail.products %}
+  {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+  $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_{{ product_name }}'] = array(
+  {% else %}
+  $form['{{ filters_par_name }}_{{ product_name }}'] = array(
+  {% endif %}
+    '#type' => 'container',
+    {% if 'products' in par_detail %}
+    '#states' => array(
+      'visible' => array(
+        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => '{{ product_name }}')),
       ),
+      'enabled' => array(
+        ':input[name="' . $mform_id . 'product_type"]' => array(array('value' => '{{ product_name }}')),
+      )
     ),
-    'enabled' => array(
-      ':input[name="' . $mform_id . 'product_type"]' => array(
-        {{ ", 'or', ".join(ns.prod_sets) }}
-      ),
-    )
-  ),
-{% endif %}
-  '#attributes' => array(
-    'class' => array(
-      'euclid-instruments-filters',
-       'multivalued-field',
-       'col-md-12'
-    )
-  ),
-  '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr>'{% else %}''{% endif %}
-);
+  {% endif %}
+    '#attributes' => array(
+      'class' => array(
+        'euclid-instruments-filters',
+         'multivalued-field',
+         'col-md-12'
+      )
+    ),
+    '#prefix' => '{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}',
+    '#suffix' => '{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div><hr>{% endif %}'
+  );
 
-{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
-{% else %}
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[filter][]'] = array(
-{% endif %}
-  '#type' => 'select',
-  '#title' => t('Filter'),
-  '#required' => TRUE,
-  '#options' => $instruments_filters,
-  '#parent_classes' => array(
-    'col-md-4',
-    'instrument-filters'
-  ),
-  # TODO not clear why, but by removing the label tag, the labels of the filters drop-down menus disappear
-  '#prefix' => '<label></label>' .'<div class="row form-group multivalued-value">'
-);
-{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
-{% else %}
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux][]'] = array(
-{% endif %}
-  '#type' => 'select',
-  '#title' => t('Flux/Mag column'),
-  '#required' => TRUE,
-  '#options' => array(),
-  '#parent_classes' => array(
-    'col-md-3 '
-  )
-);
-{% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
-$form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
-{% else %}
-$form['{{ filters_par_name }}']['{{ filters_par_name }}[flux_error][]'] = array(
-{% endif %}
-  '#type' => 'select',
-  '#title' => t('Flux/Mag error column'),
-  '#required' => TRUE,
-  '#options' => array(),
-  '#parent_classes' => array(
-    'col-md-3'
-  ),
-  '#suffix' => '</div>'
-);
+  {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+  $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[filter][]'] = array(
+  {% else %}
+  $form['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[filter][]'] = array(
+  {% endif %}
+    '#type' => 'select',
+    '#title' => t('Filter'),
+    '#required' => TRUE,
+    '#options' => $instruments_filters,
+    '#parent_classes' => array(
+      'col-md-4',
+      'instrument-filters'
+    ),
+    '#attributes' => array(
+      'multivalued_field_param_name' => '{{ filters_par_name }}',
+      'multivalued_field_product_name' => '{{ product_name }}'
+    ),
+    # TODO not clear why, but by removing the label tag, the labels of the filters drop-down menus disappear
+    '#prefix' => '<label></label>' .'<div class="row form-group multivalued-value">'
+  );
+  {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+  $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[flux][]'] = array(
+  {% else %}
+  $form['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[flux][]'] = array(
+  {% endif %}
+    '#type' => 'textfield',
+    '#title' => t('Flux/Mag column'),
+    '#required' => TRUE,
+    '#options' => array(),
+    '#parent_classes' => array(
+      'col-md-3 '
+    ),
+    '#attributes' => array(
+      'multivalued_field_param_name' => '{{ filters_par_name }}',
+      'multivalued_field_product_name' => '{{ product_name }}'
+    ),
+  );
+  {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
+  $form['{{ par_detail['extra_metadata']['group'] | snake_case }}']['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[flux_error][]'] = array(
+  {% else %}
+  $form['{{ filters_par_name }}_{{ product_name }}']['{{ filters_par_name }}_{{ product_name }}[flux_error][]'] = array(
+  {% endif %}
+    '#type' => 'textfield',
+    '#title' => t('Flux/Mag error column'),
+    '#required' => TRUE,
+    '#options' => array(),
+    '#parent_classes' => array(
+      'col-md-3'
+    ),
+    '#attributes' => array(
+      'multivalued_field_param_name' => '{{ filters_par_name }}',
+      'multivalued_field_product_name' => '{{ product_name }}'
+    ),
+    '#suffix' => '</div>'
+  );
 
-drupal_add_js(array(
-    'euclid-filters' => $instrument_defaults['{{ filters_par_name }}']
-  ), 'setting');
-
+  drupal_add_js(array(
+      'euclid-filters_{{ product_name }}' => $instrument_defaults['{{ filters_par_name }}']
+    ), 'setting');
+{% endfor %}
 {%- endmacro -%}

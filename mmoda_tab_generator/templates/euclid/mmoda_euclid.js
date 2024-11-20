@@ -19,7 +19,7 @@
         }
     };
 
-    function getFile(file_path, clicked_component=null, text_confimation=null) {
+    function getFile(file_path, id_container, clicked_component=null, text_confimation=null) {
         return fetch(file_path)
             .then((response) => {
                 if (clicked_component !== null) {
@@ -33,7 +33,7 @@
                 }
                 return response.arrayBuffer();
             })
-            .then((buffer) => readFile(buffer))
+            .then((buffer) => readFile(buffer, id_container))
             .catch((error) => {
                 if (clicked_component !== null) {
                     clicked_component.siblings('i').hide();
@@ -45,7 +45,7 @@
             });
     }
 
-    function readFile(arrayBuffer) {
+    function readFile(arrayBuffer, id_container) {
         //FITS file object containing the file headers and data units
         //Library entry point expects a FITS file array buffer
 	    let fits_file = window.FITSReader.parseFITS(arrayBuffer);
@@ -56,7 +56,7 @@
         if(hdu != null) {
             let data = hdu.data;
 
-            let selector_container = document.querySelectorAll('.euclid-instruments-filters.multivalued-field');
+            let selector_container = document.querySelectorAll(`#${id_container} .euclid-instruments-filters.multivalued-field`);
 
             selector_container[0].addEventListener('change', function(event) {
                 let selector_filter = event.target;
@@ -86,42 +86,57 @@
                     selector_filter_flux_error.innerHTML = [{value: '', text: '- Select -'}].concat(list_columns_errors_ordered.map(column => ({value: column, text: column}))).map(option => `<option value="${option.value}"${option.text === '- Select -' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
                 }
             });
-
-            updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
-            updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
+            if ($('[name="mmoda_photoz_euclid_column_name_MW_EBV"]').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_MW_EBV", keys_MW_EBV, data.columns);
+            if ($('[name="mmoda_photoz_euclid_column_name_RA"]').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_RA", keys_RA, data.columns);
+            if ($('[name="mmoda_photoz_euclid_column_name_DEC"]').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_DEC", keys_DEC, data.columns);
+            if ($('[name="mmoda_photoz_euclid_column_name_Ztrue"]').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_Ztrue", keys_Ztrue, data.columns);
+            if ($('[name="mmoda_photoz_euclid_column_name_Nz_prior_I"]').length > 0)
+                updateSelectorList("mmoda_photoz_euclid_column_name_Nz_prior_I", keys_NZ_Prior_I, data.columns);
         }
         else
             console.error(`Error: HDU not found at the index ${hdu_index}`);
 
     }
 
-    function updateSelectorList(selectorName, keys, cols) {
-        let input_selector = document.querySelector(`[name="${selectorName}"]`);
-        if (input_selector !== null) {
-            let select_selector = $('<select class="form-control from-select"></select>');
-            $.each(input_selector.attributes, function(index, attribute) {
-                if (attribute.name === 'name' || attribute.name === 'id')
-                    select_selector.attr(attribute.name, attribute.value);
-            });
-            input_selector.replaceWith(select_selector[0]);
-            let list_columns_names = guess_columns(cols, keys, true);
-            select_selector[0].innerHTML = []
-                .concat(list_columns_names.map(column => ({value: column, text: column})))
-                .map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`)
-                .join('');
+    function replaceInputWithSelect(object_identifier, selectClass, keys=undefined, cols=undefined) {
+        let inputElement = $(`${object_identifier}`);
+        if (inputElement.length > 0) {
+            $.each(inputElement, function(index, element) {
+                let selectElement = $('<select></select>').addClass(selectClass);
+                selectElement.append($('<option>', {value: "", text: "- Select -", selected: 'selected'}));
+                $.each(element.attributes, function(index, attribute) {
+                    if (attribute.name === 'name' || attribute.name === 'id' ||
+                        attribute.name === 'multivalued_field_param_name' || attribute.name === 'multivalued_field_product_name') {
+                        selectElement.attr(attribute.name, attribute.value);
+                    }
+                });
+                element.replaceWith(selectElement[0]);
+                if(element.value !== '')
+                    selectElement.append($('<option>', {value: element.value, text: element.value, selected: 'selected'}));
 
-            if(selectorName === 'mmoda_photoz_euclid_column_name_Nz_prior_I') {
-                let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
-                bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
-                let priors_select_value = $('.form-item-priors select').val();
-                if(priors_select_value === 'Redshift')
-                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
-                else
-                    bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
-            }
+                if (typeof(keys) !== 'undefined' && typeof(cols) !== 'undefined') {
+                    let list_columns_names = guess_columns(cols, keys, true);
+                    selectElement[0].innerHTML += list_columns_names.map(column => ({value: column, text: column})).map(option => `<option value="${option.value}"${option.text === '' ? ' selected="selected"' : ''}>${option.text}</option>`).join('');
+                }
+            });
+
+        }
+    }
+
+    function updateSelectorList(selectorName, keys, cols) {
+        replaceInputWithSelect(`[name="${selectorName}"]`, "form-control from-select", keys, cols);
+        if(selectorName === 'mmoda_photoz_euclid_column_name_Nz_prior_I') {
+            let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
+            bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
+            let priors_select_value = $('.form-item-priors select').val();
+            if(priors_select_value === 'Redshift')
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+            else
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
         }
     }
 
@@ -151,46 +166,54 @@
     function commonReady() {
         // add the reload button for the fits file
         let instrument_filters_selector = document.querySelectorAll('.euclid-instruments-filters');
-        if(instrument_filters_selector.length > 0)
-            var id_container = instrument_filters_selector[0].parentElement.id;
-        if(typeof(id_container) !== 'undefined' && id_container !== "") {
-            let file_url_textfield = $(`#${id_container} .form-type-textfield`);
-            if(file_url_textfield.length > 0) {
-                let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
-                                        .append($('<span>').addClass('glyphicon glyphicon-refresh'))
-                                        .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
-                let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
-                                        .append($('<span>').addClass('confirmation-msg-refresh-url'));
-                reload_fits_button.on('click', reload_fits_button_click);
-                let file_url_textfield_input = file_url_textfield.children('input');
-                let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
-                file_url_textfield.append(container_textfield_and_button[0]);
-                file_url_textfield.append(reload_fits_label_confirmation[0]);
-            }
-            let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
+        if(instrument_filters_selector.length > 0) {
+            for (let i = 0; i < instrument_filters_selector.length; i++) {
+                let id_container = instrument_filters_selector[i].parentElement.id;
+                if(typeof(id_container) !== 'undefined' && id_container !== "") {
+                    let file_url_textfield = $(`#${id_container} [class$="-url"], #${id_container} [class*="-url "]`);
+                    if(file_url_textfield.length > 0) {
+                        let reload_fits_button = $('<div>').addClass('btn btn-secondary button-refresh-url').attr('title', 'Reload fits file with the given URL')
+                                                .append($('<span>').addClass('glyphicon glyphicon-refresh'))
+                                                .append($('<i>').addClass('fa fa-spinner fa-spin').hide());
+                        let reload_fits_label_confirmation = $('<div>').addClass('confirmation-refresh-url-container')
+                                                .append($('<span>').addClass('confirmation-msg-refresh-url'));
+                        reload_fits_button.on('click', (event) => {
+                            reload_fits_button_click(event, id_container);
+                        });
+                        let file_url_textfield_input = file_url_textfield.children('input');
+                        let container_textfield_and_button = $('<div>').addClass('fits-url-container').append(file_url_textfield_input[0]).append(reload_fits_button[0]);
+                        file_url_textfield.append(container_textfield_and_button[0]);
+                        file_url_textfield.append(reload_fits_label_confirmation[0]);
 
-            if(file_input.length > 0)
-                file_input[0].addEventListener('change', function(event) {
-                    let file = event.target.files[0];
-                    file.arrayBuffer().then(arrayBuffer => {
-                        readFile(arrayBuffer);
-                    }).catch(error => {
-                        console.error('Error reading file as ArrayBuffer:', error);
-                    });
-                });
+                        replaceInputWithSelect(`#${id_container} input[id$="flux-"]`, 'form-control from-select');
+                        replaceInputWithSelect(`#${id_container} input[id$="flux-error-"]`,  'form-control from-select');
+                    }
+                    let file_input = document.querySelectorAll(`#${id_container} .form-type-file input`);
+
+                    if(file_input.length > 0)
+                        file_input[0].addEventListener('change', function(event) {
+                            let file = event.target.files[0];
+                            file.arrayBuffer().then(arrayBuffer => {
+                                readFile(arrayBuffer, id_container);
+                            }).catch(error => {
+                                console.error('Error reading file as ArrayBuffer:', error);
+                            });
+                        });
+                }
+            }
         }
 
         let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
         bootstrapValidator.addField('mmoda_photoz_euclid_column_name_Nz_prior_I', photo_z_instrument_form_validator);
         // to be activated for when the page loads the first time
-        let priors_select_value = $('.form-item-priors select').val();
-        if(priors_select_value === 'Redshift')
-            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
-        else
-            bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
-
         let priors_select = $('.form-item-priors select');
         if (priors_select.length > 0) {
+            let priors_select_value = $('.form-item-priors select').val();
+            if(priors_select_value === 'Redshift')
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', true);
+            else
+                bootstrapValidator.enableFieldValidators('mmoda_photoz_euclid_column_name_Nz_prior_I', false);
+
             priors_select[0].addEventListener('change', function(event) {
                 let priors_select_value = event.target.value;
                 let bootstrapValidator = $('.photoz_euclid-form.bv-form').data('bootstrapValidator');
@@ -207,12 +230,12 @@
         });
     }
 
-    function reload_fits_button_click(event) {
-        let refresh_button = $('.button-refresh-url');
-        let refresh_button_spinner = $('.button-refresh-url span');
+    function reload_fits_button_click(event, id_container) {
+        let refresh_button = $(`#${id_container} .button-refresh-url`);
+        let refresh_button_spinner = $(`#${id_container} .button-refresh-url span`);
         refresh_button_spinner.hide();
         refresh_button_spinner.siblings('i').show();
-        let text_confimation_span = $('.confirmation-msg-refresh-url');
+        let text_confimation_span = $(`#${id_container} .confirmation-msg-refresh-url`);
         text_confimation_span.text('');
         let fits_file_url = refresh_button.siblings('input').val();
 
@@ -222,7 +245,7 @@
                     let token = data.token;
                     parameters = {"fits_file_url": fits_file_url, "token": token};
                     let url_request = 'dispatch-data/load_frontend_fits_file_url?' + $.param(parameters);
-                    getFile(url_request, refresh_button_spinner, text_confimation_span);
+                    getFile(url_request, id_container, refresh_button_spinner, text_confimation_span);
                 }
             }
         ).error(function(jqXHR, textStatus, errorThrown) {
