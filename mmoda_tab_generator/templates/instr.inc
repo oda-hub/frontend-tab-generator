@@ -23,7 +23,7 @@
           )
         ),
     {% endif %}
-    '#prefix' => '<div class="row group-container"><hr style="margin-left: 15px; margin-right: 15px;"><label style="padding-left: 15px;" class="control-label">{{ par_detail['extra_metadata']['group'] }}</label>',
+    '#prefix' => '<div class="row group-container"><hr class="top-hr-group-container"><label class="group-label control-label">{{ par_detail['extra_metadata']['group'] }}</label>',
     '#suffix' => '</div><hr>'
     );
   {% endif %}

@@ -97,7 +97,7 @@ $form['{{ filters_par_name }}'] = array(
        'col-md-12'
     )
   ),
-  '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr style="margin-left: 15px; margin-right: 15px;">'{% else %}''{% endif %}
+  '#suffix' => {% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}'<hr class="top-hr-group-container">'{% else %}''{% endif %}
 );
 
 {% if 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}
