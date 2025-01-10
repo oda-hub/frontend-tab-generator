@@ -59,6 +59,7 @@ function mmoda_{{ frontend_name }}_install()
     'acknowledgement' => '{{ citation }}',
     'enable_use_catalog' => FALSE, {# TODO: #}
     'allowed_roles' => '{{ roles }}',
+    'js9_ext_id' => 0,
   );
   $module_settings= array_merge($instrument_info, $module_settings);
 
