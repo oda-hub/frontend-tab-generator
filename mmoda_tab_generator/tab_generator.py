@@ -25,7 +25,7 @@ class MMODATabGenerator:
                              'email': 'oda-bot@odahub.io',
                              'name': 'oda-bot',
                              'roles': 'oda workflow developer',
-                             'exp': time.time()+300}
+                             'exp': time.time()+3600}
             token = jwt.encode(token_payload, secret_key, algorithm='HS256') # TODO: hardcoded algorithm
         else:
             logger.warning('Will try to get instrument meta-data as unauthenticated user.')
@@ -53,7 +53,7 @@ class MMODATabGenerator:
                     raise RuntimeError('%s instrument metadata URL %s request status code %s', instrument_name, meta_data_url, res.status_code)
 
             except Exception as e:
-                logger.error('Error getting %s metadata from dispatcher URL: %s (attempt %s): %s', instrument_name, meta_data_url, num_try+1, repr(e))
+                logger.error('Error getting %s metadata from dispatcher URL: %s (attempt %s): %s', instrument_name, meta_data_url, n+1, repr(e))
                 exceptions.append(e)
                 time.sleep(sleep_time)
                 sleep_time *= sleep_multiplier
