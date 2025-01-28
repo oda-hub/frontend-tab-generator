@@ -115,12 +115,8 @@
       {% else %}
       $form['{{ par_name }}'] = array(
       {% endif %}
-        {% if par_detail['value'].__class__.__name__ == 'bool' %}
-        '#type' => 'radios',
-        '#options' => array(
-          1 => 'True',
-          0 => 'False'
-        ),
+      {% if par_detail['value'].__class__.__name__ == 'bool' %}
+        '#type' => 'checkbox',
         {% elif 'restrictions' in par_detail and par_detail['restrictions']['allowed_values'] is defined %}
         '#type' => 'select',
         '#options' => array(
@@ -193,9 +189,11 @@
           {% elif 'extra_metadata' in par_detail and 'group' in par_detail['extra_metadata'] %}'col-md-4'{% else %}
           'col-md-6'{% endif %}
         ),
+        {% if par_detail['value'].__class__.__name__ != 'bool' %}
         '#label_classes' => array(
           'control-label'
         ),
+        {% endif %}
         '#prefix' => '{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}<div class="row">{% endif %}{% if 'extra_metadata' in par_detail and 'description' in par_detail['extra_metadata'] %}<span title="{{ par_detail['extra_metadata']['description'] }}">{% endif %}',
         '#suffix' => '{% if 'description' in par_detail['extra_metadata'] %}</span>{% endif %}{% if 'extra_metadata' not in par_detail or 'group' not in par_detail['extra_metadata'] %}</div>{% endif %}'
 
